@@ -1,0 +1,50 @@
+<!DOCTYPE HTML>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+<title>Getting Started: Serving Web Content</title>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+</head>
+<body>
+
+	<h2>List of Cakes that are Stored in the Database:</h2>
+
+	<table style="width: 70%">
+		<tr>
+			<th align="left">Title</th>
+			<th align="left">Description</th>
+			<th align="left">Image</th>
+		</tr>
+		<tr th:each="currentCake : ${cakeList}">
+			<td th:text="${currentCake.title}">Title</td>
+			<td th:text="${currentCake.description}">Description</td>
+			<td><a th:href="${currentCake.image}"><span th:text="${currentCake.title}"/></a></td>
+		</tr>
+	</table>
+	
+	<h2>Add a Cake to the Database:</h2>
+
+	<form th:action="@{/cakes}" th:object="${cakeForm}" method="post">
+		<table style="width: 35%">
+			<tr>
+				<td align="right">Title:</td>
+				<td><input type="text" th:field="*{title}" maxlength="100" /></td>
+			</tr>
+			<tr>
+				<td align="right">Description:</td>
+				<td><input type="text" th:field="*{description}" maxlength="100" /></td>
+			</tr>
+			<tr>
+				<td align="right">Image:</td>
+				<td><input type="text" th:field="*{image}" maxlength="300" /></td>
+			</tr>
+			<tr>
+				<td></td>
+				<td><input type="submit" value="Create Cake" /></td>
+			</tr>
+		</table>
+		<br>
+		
+	</form>
+
+</body>
+</html>
