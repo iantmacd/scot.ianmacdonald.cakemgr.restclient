@@ -102,8 +102,8 @@ public class CakeManagerClientController {
 		List<Cake> cakeList = cakeResponse.getBody().getContent().stream().collect(Collectors.toList());
 
 		model.addAttribute("cakeList", cakeList);
-		model.addAttribute("cakeForm", new Cake());
 		model.addAttribute("cakeServiceError", cakeServiceError);
+		model.addAttribute("cakeForm", new Cake());
 
 		return "cakes";
 	}
