@@ -8,7 +8,7 @@
 
 	<h2>List of Cakes that are Stored in the Database:</h2>
 
-	<table style="width: 70%">
+	<table style="width: 60%">
 		<tr>
 			<th align="left">Title</th>
 			<th align="left">Description</th>
@@ -17,8 +17,8 @@
 		<tr th:each="currentCake : ${cakeList}">
 			<td th:text="${currentCake.title}">Title</td>
 			<td th:text="${currentCake.description}">Description</td>
-			<td><a th:href="${currentCake.image}"><span
-					th:text="${currentCake.title}" /></a></td>
+			<td><a th:href="${currentCake.image}"
+				th:text="${currentCake.title}"></a></td>
 		</tr>
 	</table>
 
@@ -41,7 +41,7 @@
 			</tr>
 			<tr>
 				<td></td>
-				<td><input type="submit" value="Create Cake" /></td>
+				<td><input type="submit" value="Add Cake" /></td>
 			</tr>
 		</table>
 		<br>
@@ -50,16 +50,32 @@
 
 	<div th:if="${cakeServiceError != null}">
 		<h2>An Error Was Encountered with the Cake Service:</h2>
-		<span class="error" th:text="${cakeServiceError.status}">No
-			HTTP status is available</span><br> <span class="error"
-			th:text="${cakeServiceError.message}">No error message is
-			available</span><br> <span class="error"
-			th:text="${cakeServiceError.debugMessage}">No exception trace
-			is available</span><br>
+
+		<table style="width: 60%">
+			<tr>
+				<td width="15%" align="left">HTTP Status:</td>
+				<td th:text="${cakeServiceError.status}">No HTTP status is
+					available</td>
+			</tr>
+			<tr>
+				<td>Error Message:</td>
+				<td th:text="${cakeServiceError.message}">No error message is
+					available</td>
+			</tr>
+			<tr>
+				<td>Debug Message:</td>
+				<td th:text="${cakeServiceError.debugMessage}">No exception
+					trace is available</td>
+			</tr>
+
+		</table>
+
 	</div>
-	
+
 	<br>
-	<a href="/logout">Logout</a>
+	<form th:action="@{/logout}" method="post">
+		<input type="submit" value="Logout" />
+	</form>
 
 </body>
 </html>
