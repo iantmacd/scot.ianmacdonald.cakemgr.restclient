@@ -17,10 +17,11 @@
 		<tr th:each="currentCake : ${cakeList}">
 			<td th:text="${currentCake.title}">Title</td>
 			<td th:text="${currentCake.description}">Description</td>
-			<td><a th:href="${currentCake.image}"><span th:text="${currentCake.title}"/></a></td>
+			<td><a th:href="${currentCake.image}"><span
+					th:text="${currentCake.title}" /></a></td>
 		</tr>
 	</table>
-	
+
 	<h2>Add a Cake to the Database:</h2>
 
 	<form th:action="@{/cakes}" th:object="${cakeForm}" method="post">
@@ -31,7 +32,8 @@
 			</tr>
 			<tr>
 				<td align="right">Description:</td>
-				<td><input type="text" th:field="*{description}" maxlength="100" /></td>
+				<td><input type="text" th:field="*{description}"
+					maxlength="100" /></td>
 			</tr>
 			<tr>
 				<td align="right">Image:</td>
@@ -43,8 +45,21 @@
 			</tr>
 		</table>
 		<br>
-		
+
 	</form>
+
+	<div th:if="${cakeServiceError != null}">
+		<h2>An Error Was Encountered with the Cake Service:</h2>
+		<span class="error" th:text="${cakeServiceError.status}">No
+			HTTP status is available</span><br> <span class="error"
+			th:text="${cakeServiceError.message}">No error message is
+			available</span><br> <span class="error"
+			th:text="${cakeServiceError.debugMessage}">No exception trace
+			is available</span><br>
+	</div>
+	
+	<br>
+	<a href="/logout">Logout</a>
 
 </body>
 </html>
