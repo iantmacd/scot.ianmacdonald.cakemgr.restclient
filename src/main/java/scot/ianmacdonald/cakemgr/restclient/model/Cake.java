@@ -1,5 +1,7 @@
 package scot.ianmacdonald.cakemgr.restclient.model;
 
+import java.util.Objects;
+
 public class Cake {
 	
 	private String title;
@@ -41,4 +43,22 @@ public class Cake {
 		this.image = image;
 	}
 
+	@Override
+	public int hashCode() {
+		return Objects.hash(description, image, title);
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj) {
+			return true;
+		}
+		if (!(obj instanceof Cake)) {
+			return false;
+		}
+		Cake other = (Cake) obj;
+		return Objects.equals(description, other.description) && Objects.equals(image, other.image)
+				&& Objects.equals(title, other.title);
+	}
+	
 }

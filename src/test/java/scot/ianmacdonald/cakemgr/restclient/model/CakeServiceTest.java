@@ -1,4 +1,4 @@
-package scot.ianmacdonald.cakemgr.restclient.controller;
+package scot.ianmacdonald.cakemgr.restclient.model;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.when;
@@ -28,11 +28,6 @@ import org.springframework.web.client.RestTemplate;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-
-import scot.ianmacdonald.cakemgr.restclient.model.Cake;
-import scot.ianmacdonald.cakemgr.restclient.model.CakeService;
-import scot.ianmacdonald.cakemgr.restclient.model.CakeServiceError;
-import scot.ianmacdonald.cakemgr.restclient.model.CakeServiceModel;
 
 @ExtendWith(SpringExtension.class)
 public class CakeServiceTest {
