@@ -1,5 +1,7 @@
 package scot.ianmacdonald.cakemgr.restclient.model;
 
+import java.util.Objects;
+
 import org.springframework.http.HttpStatus;
 
 public class CakeServiceError {
@@ -29,5 +31,25 @@ public class CakeServiceError {
 	public String getDebugMessage() {
 		return debugMessage;
 	}
+
+	@Override
+	public int hashCode() {
+		return Objects.hash(debugMessage, message, status);
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj) {
+			return true;
+		}
+		if (!(obj instanceof CakeServiceError)) {
+			return false;
+		}
+		CakeServiceError other = (CakeServiceError) obj;
+		return Objects.equals(debugMessage, other.debugMessage) && Objects.equals(message, other.message)
+				&& status == other.status;
+	}
+	
+	
 
 }
