@@ -7,37 +7,16 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.model;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
-import static scot.ianmacdonald.cakemgr.restclient.util.CakeServiceClientTestUtils.assertDuplicateError;
-import static scot.ianmacdonald.cakemgr.restclient.util.CakeServiceClientTestUtils.assertFourCakes;
-import static scot.ianmacdonald.cakemgr.restclient.util.CakeServiceClientTestUtils.assertNoCakes;
-import static scot.ianmacdonald.cakemgr.restclient.util.CakeServiceClientTestUtils.assertNoError;
-import static scot.ianmacdonald.cakemgr.restclient.util.CakeServiceClientTestUtils.assertReadCakesParseError;
-import static scot.ianmacdonald.cakemgr.restclient.util.CakeServiceClientTestUtils.assertSaveCakeParseError;
-import static scot.ianmacdonald.cakemgr.restclient.util.CakeServiceClientTestUtils.assertThreeCakes;
-import static scot.ianmacdonald.cakemgr.restclient.util.CakeServiceClientTestUtils.assertTwoCakes;
-import static scot.ianmacdonald.cakemgr.restclient.util.CakeServiceClientTestUtils.chocolateCake;
-import static scot.ianmacdonald.cakemgr.restclient.util.CakeServiceClientTestUtils.chocolateCakeEntity;
-import static scot.ianmacdonald.cakemgr.restclient.util.CakeServiceClientTestUtils.duplicateCakeException;
-import static scot.ianmacdonald.cakemgr.restclient.util.CakeServiceClientTestUtils.duplicateTitleCakeServiceError;
-import static scot.ianmacdonald.cakemgr.restclient.util.CakeServiceClientTestUtils.getCakesList;
-import static scot.ianmacdonald.cakemgr.restclient.util.CakeServiceClientTestUtils.getCakesResponse;
-import static scot.ianmacdonald.cakemgr.restclient.util.CakeServiceClientTestUtils.httpHeaders;
-import static scot.ianmacdonald.cakemgr.restclient.util.CakeServiceClientTestUtils.reesDonutEntity;
-import static scot.ianmacdonald.cakemgr.restclient.util.CakeServiceClientTestUtils.reesesDonut;
-import static scot.ianmacdonald.cakemgr.restclient.util.CakeServiceClientTestUtils.saveCakeGetCakesResponse;
-import static scot.ianmacdonald.cakemgr.restclient.util.CakeServiceClientTestUtils.saveCakeGetCakesTwiceResponse;
-import static scot.ianmacdonald.cakemgr.restclient.util.CakeServiceClientTestUtils.saveCakeList;
-import static scot.ianmacdonald.cakemgr.restclient.util.CakeServiceClientTestUtils.saveCakeResponse;
-import static scot.ianmacdonald.cakemgr.restclient.util.CakeServiceClientTestUtils.saveCakeTwiceList;
-import static scot.ianmacdonald.cakemgr.restclient.util.CakeServiceClientTestUtils.saveCakeTwiceResponse;
-import static scot.ianmacdonald.cakemgr.restclient.util.CakeServiceClientTestUtils.stringEntity;
-import static scot.ianmacdonald.cakemgr.restclient.util.CakeServiceClientTestUtils.unparseableGetCakesException;
-import static scot.ianmacdonald.cakemgr.restclient.util.CakeServiceClientTestUtils.unparseableGetCakesExceptionError;
-import static scot.ianmacdonald.cakemgr.restclient.util.CakeServiceClientTestUtils.unparseableSaveCakeException;
-import static scot.ianmacdonald.cakemgr.restclient.util.CakeServiceClientTestUtils.unparseableSaveCakeExceptionError;
+import static scot.ianmacdonald.cakemgr.restclient.util.CakeManagerClientTestUtils.assertDuplicateError;
+import static scot.ianmacdonald.cakemgr.restclient.util.CakeManagerClientTestUtils.assertFourCakes;
+import static scot.ianmacdonald.cakemgr.restclient.util.CakeManagerClientTestUtils.assertNoCakes;
+import static scot.ianmacdonald.cakemgr.restclient.util.CakeManagerClientTestUtils.assertNoError;
+import static scot.ianmacdonald.cakemgr.restclient.util.CakeManagerClientTestUtils.assertReadCakesParseError;
+import static scot.ianmacdonald.cakemgr.restclient.util.CakeManagerClientTestUtils.assertSaveCakeParseError;
+import static scot.ianmacdonald.cakemgr.restclient.util.CakeManagerClientTestUtils.assertThreeCakes;
+import static scot.ianmacdonald.cakemgr.restclient.util.CakeManagerClientTestUtils.assertTwoCakes;
 
 import java.util.ArrayList;
-import java.util.Collections;
 
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
@@ -50,7 +29,6 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.hateoas.CollectionModel;
-import org.springframework.hateoas.MediaTypes;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
@@ -59,10 +37,11 @@ import org.springframework.web.client.RestTemplate;
 
 import scot.ianmacdonald.cakemgr.restclient.model.Cake;
 import scot.ianmacdonald.cakemgr.restclient.model.CakeService;
+import scot.ianmacdonald.cakemgr.restclient.util.CakeManagerClientTestUtils;
 
 @WebMvcTest
 @AutoConfigureMockMvc(addFilters = false)
-public class CakeManagerClientIntegrationTest {
+public class CakeManagerClientIntegrationTest implements CakeManagerClientTestUtils {
 
 	@Autowired
 	private MockMvc mockMvc;
@@ -85,20 +64,18 @@ public class CakeManagerClientIntegrationTest {
 	@BeforeAll
 	public static void setUpStaticTestData(@Autowired RestTemplate cakeServiceRestTemplate) {
 
-		httpHeaders.setContentType(MediaTypes.HAL_JSON);
-		httpHeaders.setAccept(Collections.singletonList(MediaTypes.HAL_JSON));
 		restTemplateOrderVerifier = inOrder(cakeServiceRestTemplate);
 	}
 
 	@Test
 	public void testGetCakesRequest() throws Exception {
 
-		when(cakeServiceRestTemplate.exchange("http://localhost:8080/cakes", HttpMethod.GET, stringEntity,
+		when(cakeServiceRestTemplate.exchange("http://localhost:8080/cakes", HttpMethod.GET, STRING_ENTITY,
 				new ParameterizedTypeReference<CollectionModel<Cake>>() {
-				})).thenReturn(getCakesResponse);
+				})).thenReturn(GET_CAKES_RESPONSE);
 		
 		MvcResult result = mockMvc.perform(get("/cakes")).andExpect(status().isOk())
-				.andExpect(model().attribute("cakeList", equalTo(getCakesList)))
+				.andExpect(model().attribute("cakeList", equalTo(GET_CAKES_LIST)))
 				.andExpect(model().attribute("cakeServiceError", equalTo(null)))
 				.andExpect(model().attribute("cakeForm", equalTo(new Cake()))).andReturn();
 
@@ -109,25 +86,25 @@ public class CakeManagerClientIntegrationTest {
 		assertNoError(content);
 
 		restTemplateOrderVerifier.verify(cakeServiceRestTemplate).exchange("http://localhost:8080/cakes", HttpMethod.GET,
-				stringEntity, new ParameterizedTypeReference<CollectionModel<Cake>>() {
+				STRING_ENTITY, new ParameterizedTypeReference<CollectionModel<Cake>>() {
 				});
 	}
 	
 	@Test
 	public void testPostCakeRequest() throws Exception {
 
-		when(cakeServiceRestTemplate.exchange("http://localhost:8080/cakes", HttpMethod.POST, reesDonutEntity,
-				Cake.class)).thenReturn(saveCakeResponse);
+		when(cakeServiceRestTemplate.exchange("http://localhost:8080/cakes", HttpMethod.POST, REESES_DONUT_ENTITY,
+				Cake.class)).thenReturn(SAVE_CAKE_RESPONSE);
 
-		when(cakeServiceRestTemplate.exchange("http://localhost:8080/cakes", HttpMethod.GET, stringEntity,
+		when(cakeServiceRestTemplate.exchange("http://localhost:8080/cakes", HttpMethod.GET, STRING_ENTITY,
 				new ParameterizedTypeReference<CollectionModel<Cake>>() {
-				})).thenReturn(saveCakeGetCakesResponse);
+				})).thenReturn(SAVE_CAKE_GET_CAKES_RESPONSE);
 
 		MvcResult result = mockMvc
 				.perform(post("/cakes").contentType(MediaType.APPLICATION_FORM_URLENCODED)
-						.param("title", reesesDonut.getTitle()).param("description", reesesDonut.getDescription())
-						.param("image", reesesDonut.getImage()))
-				.andExpect(status().isOk()).andExpect(model().attribute("cakeList", equalTo(saveCakeList)))
+						.param("title", REESES_DONUT.getTitle()).param("description", REESES_DONUT.getDescription())
+						.param("image", REESES_DONUT.getImage()))
+				.andExpect(status().isOk()).andExpect(model().attribute("cakeList", equalTo(SAVE_CAKE_LIST)))
 				.andExpect(model().attribute("cakeServiceError", equalTo(null)))
 				.andExpect(model().attribute("cakeForm", equalTo(new Cake()))).andReturn();
 
@@ -138,28 +115,28 @@ public class CakeManagerClientIntegrationTest {
 		assertNoError(content);
 
 		restTemplateOrderVerifier.verify(cakeServiceRestTemplate).exchange("http://localhost:8080/cakes", HttpMethod.POST,
-				reesDonutEntity, Cake.class);
+				REESES_DONUT_ENTITY, Cake.class);
 		restTemplateOrderVerifier.verify(cakeServiceRestTemplate).exchange("http://localhost:8080/cakes", HttpMethod.GET,
-				stringEntity, new ParameterizedTypeReference<CollectionModel<Cake>>() {
+				STRING_ENTITY, new ParameterizedTypeReference<CollectionModel<Cake>>() {
 				});
 	}
 
 	@Test
 	public void testPostCakeTwiceRequest() throws Exception {
 
-		when(cakeServiceRestTemplate.exchange("http://localhost:8080/cakes", HttpMethod.POST, reesDonutEntity,
-				Cake.class)).thenReturn(saveCakeResponse);
-		when(cakeServiceRestTemplate.exchange("http://localhost:8080/cakes", HttpMethod.POST, chocolateCakeEntity,
-				Cake.class)).thenReturn(saveCakeTwiceResponse);
-		when(cakeServiceRestTemplate.exchange("http://localhost:8080/cakes", HttpMethod.GET, stringEntity,
+		when(cakeServiceRestTemplate.exchange("http://localhost:8080/cakes", HttpMethod.POST, REESES_DONUT_ENTITY,
+				Cake.class)).thenReturn(SAVE_CAKE_RESPONSE);
+		when(cakeServiceRestTemplate.exchange("http://localhost:8080/cakes", HttpMethod.POST, CHOCOLATE_CAKE_ENTITY,
+				Cake.class)).thenReturn(SAVE_CAKE_TWICE_RESPONSE);
+		when(cakeServiceRestTemplate.exchange("http://localhost:8080/cakes", HttpMethod.GET, STRING_ENTITY,
 				new ParameterizedTypeReference<CollectionModel<Cake>>() {
-				})).thenReturn(saveCakeGetCakesResponse).thenReturn(saveCakeGetCakesTwiceResponse);
+				})).thenReturn(SAVE_CAKE_GET_CAKES_RESPONSE).thenReturn(SAVE_CAKE_GET_CAKES_TWICE_RESPONSE);
 
 		MvcResult result = mockMvc
 				.perform(post("/cakes").contentType(MediaType.APPLICATION_FORM_URLENCODED)
-						.param("title", reesesDonut.getTitle()).param("description", reesesDonut.getDescription())
-						.param("image", reesesDonut.getImage()))
-				.andExpect(status().isOk()).andExpect(model().attribute("cakeList", equalTo(saveCakeList)))
+						.param("title", REESES_DONUT.getTitle()).param("description", REESES_DONUT.getDescription())
+						.param("image", REESES_DONUT.getImage()))
+				.andExpect(status().isOk()).andExpect(model().attribute("cakeList", equalTo(SAVE_CAKE_LIST)))
 				.andExpect(model().attribute("cakeServiceError", equalTo(null)))
 				.andExpect(model().attribute("cakeForm", equalTo(new Cake()))).andReturn();
 
@@ -171,9 +148,9 @@ public class CakeManagerClientIntegrationTest {
 
 		result = mockMvc
 				.perform(post("/cakes").contentType(MediaType.APPLICATION_FORM_URLENCODED)
-						.param("title", chocolateCake.getTitle()).param("description", chocolateCake.getDescription())
-						.param("image", chocolateCake.getImage()))
-				.andExpect(status().isOk()).andExpect(model().attribute("cakeList", equalTo(saveCakeTwiceList)))
+						.param("title", CHOCOLATE_CAKE.getTitle()).param("description", CHOCOLATE_CAKE.getDescription())
+						.param("image", CHOCOLATE_CAKE.getImage()))
+				.andExpect(status().isOk()).andExpect(model().attribute("cakeList", equalTo(SAVE_CAKE_TWICE_LIST)))
 				.andExpect(model().attribute("cakeServiceError", equalTo(null)))
 				.andExpect(model().attribute("cakeForm", equalTo(new Cake()))).andReturn();
 
@@ -184,14 +161,14 @@ public class CakeManagerClientIntegrationTest {
 		assertNoError(content);
 
 		restTemplateOrderVerifier.verify(cakeServiceRestTemplate).exchange("http://localhost:8080/cakes", HttpMethod.POST,
-				reesDonutEntity, Cake.class);
+				REESES_DONUT_ENTITY, Cake.class);
 		restTemplateOrderVerifier.verify(cakeServiceRestTemplate).exchange("http://localhost:8080/cakes", HttpMethod.GET,
-				stringEntity, new ParameterizedTypeReference<CollectionModel<Cake>>() {
+				STRING_ENTITY, new ParameterizedTypeReference<CollectionModel<Cake>>() {
 				});
 		restTemplateOrderVerifier.verify(cakeServiceRestTemplate).exchange("http://localhost:8080/cakes", HttpMethod.POST,
-				chocolateCakeEntity, Cake.class);
+				CHOCOLATE_CAKE_ENTITY, Cake.class);
 		restTemplateOrderVerifier.verify(cakeServiceRestTemplate).exchange("http://localhost:8080/cakes", HttpMethod.GET,
-				stringEntity, new ParameterizedTypeReference<CollectionModel<Cake>>() {
+				STRING_ENTITY, new ParameterizedTypeReference<CollectionModel<Cake>>() {
 				});
 
 	}
@@ -199,18 +176,18 @@ public class CakeManagerClientIntegrationTest {
 	@Test
 	public void testPostSameCakeTwiceRequest() throws Exception {
 
-		when(cakeServiceRestTemplate.exchange("http://localhost:8080/cakes", HttpMethod.POST, reesDonutEntity,
-				Cake.class)).thenReturn(saveCakeResponse).thenThrow(duplicateCakeException);
+		when(cakeServiceRestTemplate.exchange("http://localhost:8080/cakes", HttpMethod.POST, REESES_DONUT_ENTITY,
+				Cake.class)).thenReturn(SAVE_CAKE_RESPONSE).thenThrow(DUPLICATE_CAKE_EXCEPTION);
 
-		when(cakeServiceRestTemplate.exchange("http://localhost:8080/cakes", HttpMethod.GET, stringEntity,
+		when(cakeServiceRestTemplate.exchange("http://localhost:8080/cakes", HttpMethod.GET, STRING_ENTITY,
 				new ParameterizedTypeReference<CollectionModel<Cake>>() {
-				})).thenReturn(saveCakeGetCakesResponse).thenReturn(saveCakeGetCakesResponse);
+				})).thenReturn(SAVE_CAKE_GET_CAKES_RESPONSE).thenReturn(SAVE_CAKE_GET_CAKES_RESPONSE);
 
 		MvcResult result = mockMvc
 				.perform(post("/cakes").contentType(MediaType.APPLICATION_FORM_URLENCODED)
-						.param("title", reesesDonut.getTitle()).param("description", reesesDonut.getDescription())
-						.param("image", reesesDonut.getImage()))
-				.andExpect(status().isOk()).andExpect(model().attribute("cakeList", equalTo(saveCakeList)))
+						.param("title", REESES_DONUT.getTitle()).param("description", REESES_DONUT.getDescription())
+						.param("image", REESES_DONUT.getImage()))
+				.andExpect(status().isOk()).andExpect(model().attribute("cakeList", equalTo(SAVE_CAKE_LIST)))
 				.andExpect(model().attribute("cakeServiceError", equalTo(null)))
 				.andExpect(model().attribute("cakeForm", equalTo(new Cake()))).andReturn();
 
@@ -222,10 +199,10 @@ public class CakeManagerClientIntegrationTest {
 
 		result = mockMvc
 				.perform(post("/cakes").contentType(MediaType.APPLICATION_FORM_URLENCODED)
-						.param("title", reesesDonut.getTitle()).param("description", reesesDonut.getDescription())
-						.param("image", reesesDonut.getImage()))
-				.andExpect(status().isOk()).andExpect(model().attribute("cakeList", equalTo(saveCakeList)))
-				.andExpect(model().attribute("cakeServiceError", equalTo(duplicateTitleCakeServiceError)))
+						.param("title", REESES_DONUT.getTitle()).param("description", REESES_DONUT.getDescription())
+						.param("image", REESES_DONUT.getImage()))
+				.andExpect(status().isOk()).andExpect(model().attribute("cakeList", equalTo(SAVE_CAKE_LIST)))
+				.andExpect(model().attribute("cakeServiceError", equalTo(DUPLICATE_TITLE_CAKE_SERVICE_ERROR)))
 				.andExpect(model().attribute("cakeForm", equalTo(new Cake()))).andReturn();
 
 		content = result.getResponse().getContentAsString();
@@ -235,14 +212,14 @@ public class CakeManagerClientIntegrationTest {
 		assertDuplicateError(content);
 
 		restTemplateOrderVerifier.verify(cakeServiceRestTemplate).exchange("http://localhost:8080/cakes", HttpMethod.POST,
-				reesDonutEntity, Cake.class);
+				REESES_DONUT_ENTITY, Cake.class);
 		restTemplateOrderVerifier.verify(cakeServiceRestTemplate).exchange("http://localhost:8080/cakes", HttpMethod.GET,
-				stringEntity, new ParameterizedTypeReference<CollectionModel<Cake>>() {
+				STRING_ENTITY, new ParameterizedTypeReference<CollectionModel<Cake>>() {
 				});
 		restTemplateOrderVerifier.verify(cakeServiceRestTemplate).exchange("http://localhost:8080/cakes", HttpMethod.POST,
-				reesDonutEntity, Cake.class);
+				REESES_DONUT_ENTITY, Cake.class);
 		restTemplateOrderVerifier.verify(cakeServiceRestTemplate).exchange("http://localhost:8080/cakes", HttpMethod.GET,
-				stringEntity, new ParameterizedTypeReference<CollectionModel<Cake>>() {
+				STRING_ENTITY, new ParameterizedTypeReference<CollectionModel<Cake>>() {
 				});
 
 	}
@@ -250,13 +227,13 @@ public class CakeManagerClientIntegrationTest {
 	@Test
 	public void testGetCakesErrorIsUnparseableJson() throws Exception {
 
-		when(cakeServiceRestTemplate.exchange("http://localhost:8080/cakes", HttpMethod.GET, stringEntity,
+		when(cakeServiceRestTemplate.exchange("http://localhost:8080/cakes", HttpMethod.GET, STRING_ENTITY,
 				new ParameterizedTypeReference<CollectionModel<Cake>>() {
-				})).thenThrow(unparseableGetCakesException);
+				})).thenThrow(UNPARSEABLE_GET_CAKES_EXCEPTION);
 
 		MvcResult result = mockMvc.perform(get("/cakes")).andExpect(status().isOk())
 				.andExpect(model().attribute("cakeList", equalTo(new ArrayList<Cake>())))
-				.andExpect(model().attribute("cakeServiceError", equalTo(unparseableGetCakesExceptionError)))
+				.andExpect(model().attribute("cakeServiceError", equalTo(UNPARSEABLE_GET_CAKES_ERROR)))
 				.andExpect(model().attribute("cakeForm", equalTo(new Cake()))).andReturn();
 
 		String content = result.getResponse().getContentAsString();
@@ -266,26 +243,26 @@ public class CakeManagerClientIntegrationTest {
 		assertReadCakesParseError(content);
 
 		restTemplateOrderVerifier.verify(cakeServiceRestTemplate).exchange("http://localhost:8080/cakes", HttpMethod.GET,
-				stringEntity, new ParameterizedTypeReference<CollectionModel<Cake>>() {
+				STRING_ENTITY, new ParameterizedTypeReference<CollectionModel<Cake>>() {
 				});
 	}
 
 	@Test
 	public void testPostCakeErrorIsUnparseableJson() throws Exception {
 
-		when(cakeServiceRestTemplate.exchange("http://localhost:8080/cakes", HttpMethod.POST, reesDonutEntity,
-				Cake.class)).thenThrow(unparseableSaveCakeException);
+		when(cakeServiceRestTemplate.exchange("http://localhost:8080/cakes", HttpMethod.POST, REESES_DONUT_ENTITY,
+				Cake.class)).thenThrow(UNPARSEABLE_SAVE_CAKE_EXCEPTION);
 
-		when(cakeServiceRestTemplate.exchange("http://localhost:8080/cakes", HttpMethod.GET, stringEntity,
+		when(cakeServiceRestTemplate.exchange("http://localhost:8080/cakes", HttpMethod.GET, STRING_ENTITY,
 				new ParameterizedTypeReference<CollectionModel<Cake>>() {
-				})).thenReturn(getCakesResponse);
+				})).thenReturn(GET_CAKES_RESPONSE);
 
 		MvcResult result = mockMvc
 				.perform(post("/cakes").contentType(MediaType.APPLICATION_FORM_URLENCODED)
-						.param("title", reesesDonut.getTitle()).param("description", reesesDonut.getDescription())
-						.param("image", reesesDonut.getImage()))
-				.andExpect(status().isOk()).andExpect(model().attribute("cakeList", equalTo(getCakesList)))
-				.andExpect(model().attribute("cakeServiceError", equalTo(unparseableSaveCakeExceptionError)))
+						.param("title", REESES_DONUT.getTitle()).param("description", REESES_DONUT.getDescription())
+						.param("image", REESES_DONUT.getImage()))
+				.andExpect(status().isOk()).andExpect(model().attribute("cakeList", equalTo(GET_CAKES_LIST)))
+				.andExpect(model().attribute("cakeServiceError", equalTo(UNPARSEABLE_SAVE_CAKE_ERROR)))
 				.andExpect(model().attribute("cakeForm", equalTo(new Cake()))).andReturn();
 
 		String content = result.getResponse().getContentAsString();
@@ -295,28 +272,28 @@ public class CakeManagerClientIntegrationTest {
 		assertSaveCakeParseError(content);
 
 		restTemplateOrderVerifier.verify(cakeServiceRestTemplate).exchange("http://localhost:8080/cakes", HttpMethod.POST,
-				reesDonutEntity, Cake.class);
+				REESES_DONUT_ENTITY, Cake.class);
 		restTemplateOrderVerifier.verify(cakeServiceRestTemplate).exchange("http://localhost:8080/cakes", HttpMethod.GET,
-				stringEntity, new ParameterizedTypeReference<CollectionModel<Cake>>() {
+				STRING_ENTITY, new ParameterizedTypeReference<CollectionModel<Cake>>() {
 				});
 	}
 	
 	@Test
 	public void testPostCakeAndGetCakesErrorsAreUnparseableJson() throws Exception {
 
-		when(cakeServiceRestTemplate.exchange("http://localhost:8080/cakes", HttpMethod.POST, reesDonutEntity,
-				Cake.class)).thenThrow(unparseableSaveCakeException);
+		when(cakeServiceRestTemplate.exchange("http://localhost:8080/cakes", HttpMethod.POST, REESES_DONUT_ENTITY,
+				Cake.class)).thenThrow(UNPARSEABLE_SAVE_CAKE_EXCEPTION);
 
-		when(cakeServiceRestTemplate.exchange("http://localhost:8080/cakes", HttpMethod.GET, stringEntity,
+		when(cakeServiceRestTemplate.exchange("http://localhost:8080/cakes", HttpMethod.GET, STRING_ENTITY,
 				new ParameterizedTypeReference<CollectionModel<Cake>>() {
-				})).thenThrow(unparseableGetCakesException);
+				})).thenThrow(UNPARSEABLE_GET_CAKES_EXCEPTION);
 
 		MvcResult result = mockMvc
 				.perform(post("/cakes").contentType(MediaType.APPLICATION_FORM_URLENCODED)
-						.param("title", reesesDonut.getTitle()).param("description", reesesDonut.getDescription())
-						.param("image", reesesDonut.getImage()))
+						.param("title", REESES_DONUT.getTitle()).param("description", REESES_DONUT.getDescription())
+						.param("image", REESES_DONUT.getImage()))
 				.andExpect(status().isOk()).andExpect(model().attribute("cakeList", equalTo(new ArrayList<Cake>())))
-				.andExpect(model().attribute("cakeServiceError", equalTo(unparseableGetCakesExceptionError)))
+				.andExpect(model().attribute("cakeServiceError", equalTo(UNPARSEABLE_GET_CAKES_ERROR)))
 				.andExpect(model().attribute("cakeForm", equalTo(new Cake()))).andReturn();
 
 		String content = result.getResponse().getContentAsString();
@@ -326,9 +303,9 @@ public class CakeManagerClientIntegrationTest {
 		assertReadCakesParseError(content);
 
 		restTemplateOrderVerifier.verify(cakeServiceRestTemplate).exchange("http://localhost:8080/cakes", HttpMethod.POST,
-				reesDonutEntity, Cake.class);
+				REESES_DONUT_ENTITY, Cake.class);
 		restTemplateOrderVerifier.verify(cakeServiceRestTemplate).exchange("http://localhost:8080/cakes", HttpMethod.GET,
-				stringEntity, new ParameterizedTypeReference<CollectionModel<Cake>>() {
+				STRING_ENTITY, new ParameterizedTypeReference<CollectionModel<Cake>>() {
 				});
 	}
 

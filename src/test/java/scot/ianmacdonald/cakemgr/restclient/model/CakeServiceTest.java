@@ -3,28 +3,6 @@ package scot.ianmacdonald.cakemgr.restclient.model;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.inOrder;
 import static org.mockito.Mockito.when;
-import static scot.ianmacdonald.cakemgr.restclient.util.CakeServiceClientTestUtils.chocolateCake;
-import static scot.ianmacdonald.cakemgr.restclient.util.CakeServiceClientTestUtils.chocolateCakeEntity;
-import static scot.ianmacdonald.cakemgr.restclient.util.CakeServiceClientTestUtils.duplicateCakeException;
-import static scot.ianmacdonald.cakemgr.restclient.util.CakeServiceClientTestUtils.duplicateTitleCakeServiceError;
-import static scot.ianmacdonald.cakemgr.restclient.util.CakeServiceClientTestUtils.getCakesList;
-import static scot.ianmacdonald.cakemgr.restclient.util.CakeServiceClientTestUtils.getCakesResponse;
-import static scot.ianmacdonald.cakemgr.restclient.util.CakeServiceClientTestUtils.httpHeaders;
-import static scot.ianmacdonald.cakemgr.restclient.util.CakeServiceClientTestUtils.reesDonutEntity;
-import static scot.ianmacdonald.cakemgr.restclient.util.CakeServiceClientTestUtils.reesesDonut;
-import static scot.ianmacdonald.cakemgr.restclient.util.CakeServiceClientTestUtils.saveCakeGetCakesResponse;
-import static scot.ianmacdonald.cakemgr.restclient.util.CakeServiceClientTestUtils.saveCakeGetCakesTwiceResponse;
-import static scot.ianmacdonald.cakemgr.restclient.util.CakeServiceClientTestUtils.saveCakeList;
-import static scot.ianmacdonald.cakemgr.restclient.util.CakeServiceClientTestUtils.saveCakeResponse;
-import static scot.ianmacdonald.cakemgr.restclient.util.CakeServiceClientTestUtils.saveCakeTwiceList;
-import static scot.ianmacdonald.cakemgr.restclient.util.CakeServiceClientTestUtils.saveCakeTwiceResponse;
-import static scot.ianmacdonald.cakemgr.restclient.util.CakeServiceClientTestUtils.stringEntity;
-import static scot.ianmacdonald.cakemgr.restclient.util.CakeServiceClientTestUtils.unparseableGetCakesException;
-import static scot.ianmacdonald.cakemgr.restclient.util.CakeServiceClientTestUtils.unparseableGetCakesExceptionError;
-import static scot.ianmacdonald.cakemgr.restclient.util.CakeServiceClientTestUtils.unparseableSaveCakeException;
-import static scot.ianmacdonald.cakemgr.restclient.util.CakeServiceClientTestUtils.unparseableSaveCakeExceptionError;
-
-import java.util.Collections;
 
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
@@ -36,15 +14,16 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.hateoas.CollectionModel;
-import org.springframework.hateoas.MediaTypes;
 import org.springframework.http.HttpMethod;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.web.client.RestTemplate;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 
+import scot.ianmacdonald.cakemgr.restclient.util.CakeManagerClientTestUtils;
+
 @ExtendWith(SpringExtension.class)
-public class CakeServiceTest {
+public class CakeServiceTest implements CakeManagerClientTestUtils {
 
 	@TestConfiguration
 	static class CakeServiceTestContextConfiguration {
@@ -67,45 +46,43 @@ public class CakeServiceTest {
 	@BeforeAll
 	public static void setUpStaticTestData(@Autowired RestTemplate cakeServiceRestTemplate) {
 
-		httpHeaders.setContentType(MediaTypes.HAL_JSON);
-		httpHeaders.setAccept(Collections.singletonList(MediaTypes.HAL_JSON));
 		restTemplateOrderVerifier = inOrder(cakeServiceRestTemplate);
 	}
 
 	@Test
 	public void testGetCakes() {
 
-		when(cakeServiceRestTemplate.exchange("http://localhost:8080/cakes", HttpMethod.GET, stringEntity,
+		when(cakeServiceRestTemplate.exchange("http://localhost:8080/cakes", HttpMethod.GET, STRING_ENTITY,
 				new ParameterizedTypeReference<CollectionModel<Cake>>() {
-				})).thenReturn(getCakesResponse);
+				})).thenReturn(GET_CAKES_RESPONSE);
 
 		CakeServiceModel getCakesModel = cakeService.getCakes();
-		assertThat(getCakesModel.getCakes()).isEqualTo(getCakesList);
+		assertThat(getCakesModel.getCakes()).isEqualTo(GET_CAKES_LIST);
 		assertThat(getCakesModel.getCakeServiceError()).isNull();
 
 		restTemplateOrderVerifier.verify(cakeServiceRestTemplate).exchange("http://localhost:8080/cakes", HttpMethod.GET,
-				stringEntity, new ParameterizedTypeReference<CollectionModel<Cake>>() {
+				STRING_ENTITY, new ParameterizedTypeReference<CollectionModel<Cake>>() {
 				});
 	}
 
 	@Test
 	public void testSaveCake() {
 
-		when(cakeServiceRestTemplate.exchange("http://localhost:8080/cakes", HttpMethod.POST, reesDonutEntity,
-				Cake.class)).thenReturn(saveCakeResponse);
+		when(cakeServiceRestTemplate.exchange("http://localhost:8080/cakes", HttpMethod.POST, REESES_DONUT_ENTITY,
+				Cake.class)).thenReturn(SAVE_CAKE_RESPONSE);
 
-		when(cakeServiceRestTemplate.exchange("http://localhost:8080/cakes", HttpMethod.GET, stringEntity,
+		when(cakeServiceRestTemplate.exchange("http://localhost:8080/cakes", HttpMethod.GET, STRING_ENTITY,
 				new ParameterizedTypeReference<CollectionModel<Cake>>() {
-				})).thenReturn(saveCakeGetCakesResponse);
+				})).thenReturn(SAVE_CAKE_GET_CAKES_RESPONSE);
 
-		CakeServiceModel saveCakeModel = cakeService.saveCake(reesesDonut);
-		assertThat(saveCakeModel.getCakes()).isEqualTo(saveCakeList);
+		CakeServiceModel saveCakeModel = cakeService.saveCake(REESES_DONUT);
+		assertThat(saveCakeModel.getCakes()).isEqualTo(SAVE_CAKE_LIST);
 		assertThat(saveCakeModel.getCakeServiceError()).isNull();
 
 		restTemplateOrderVerifier.verify(cakeServiceRestTemplate).exchange("http://localhost:8080/cakes", HttpMethod.POST,
-				reesDonutEntity, Cake.class);
+				REESES_DONUT_ENTITY, Cake.class);
 		restTemplateOrderVerifier.verify(cakeServiceRestTemplate).exchange("http://localhost:8080/cakes", HttpMethod.GET,
-				stringEntity, new ParameterizedTypeReference<CollectionModel<Cake>>() {
+				STRING_ENTITY, new ParameterizedTypeReference<CollectionModel<Cake>>() {
 				});
 
 	}
@@ -113,30 +90,30 @@ public class CakeServiceTest {
 	@Test
 	public void testSaveCakeTwice() {
 
-		when(cakeServiceRestTemplate.exchange("http://localhost:8080/cakes", HttpMethod.POST, reesDonutEntity,
-				Cake.class)).thenReturn(saveCakeResponse);
-		when(cakeServiceRestTemplate.exchange("http://localhost:8080/cakes", HttpMethod.POST, chocolateCakeEntity,
-				Cake.class)).thenReturn(saveCakeTwiceResponse);
-		when(cakeServiceRestTemplate.exchange("http://localhost:8080/cakes", HttpMethod.GET, stringEntity,
+		when(cakeServiceRestTemplate.exchange("http://localhost:8080/cakes", HttpMethod.POST, REESES_DONUT_ENTITY,
+				Cake.class)).thenReturn(SAVE_CAKE_RESPONSE);
+		when(cakeServiceRestTemplate.exchange("http://localhost:8080/cakes", HttpMethod.POST, CHOCOLATE_CAKE_ENTITY,
+				Cake.class)).thenReturn(SAVE_CAKE_TWICE_RESPONSE);
+		when(cakeServiceRestTemplate.exchange("http://localhost:8080/cakes", HttpMethod.GET, STRING_ENTITY,
 				new ParameterizedTypeReference<CollectionModel<Cake>>() {
-				})).thenReturn(saveCakeGetCakesResponse).thenReturn(saveCakeGetCakesTwiceResponse);
+				})).thenReturn(SAVE_CAKE_GET_CAKES_RESPONSE).thenReturn(SAVE_CAKE_GET_CAKES_TWICE_RESPONSE);
 
-		CakeServiceModel saveCakeModel = cakeService.saveCake(reesesDonut);
-		assertThat(saveCakeModel.getCakes()).isEqualTo(saveCakeList);
+		CakeServiceModel saveCakeModel = cakeService.saveCake(REESES_DONUT);
+		assertThat(saveCakeModel.getCakes()).isEqualTo(SAVE_CAKE_LIST);
 		assertThat(saveCakeModel.getCakeServiceError()).isNull();
-		CakeServiceModel saveCakeTwiceModel = cakeService.saveCake(chocolateCake);
-		assertThat(saveCakeTwiceModel.getCakes()).isEqualTo(saveCakeTwiceList);
+		CakeServiceModel saveCakeTwiceModel = cakeService.saveCake(CHOCOLATE_CAKE);
+		assertThat(saveCakeTwiceModel.getCakes()).isEqualTo(SAVE_CAKE_TWICE_LIST);
 		assertThat(saveCakeTwiceModel.getCakeServiceError()).isNull();
 
 		restTemplateOrderVerifier.verify(cakeServiceRestTemplate).exchange("http://localhost:8080/cakes", HttpMethod.POST,
-				reesDonutEntity, Cake.class);
+				REESES_DONUT_ENTITY, Cake.class);
 		restTemplateOrderVerifier.verify(cakeServiceRestTemplate).exchange("http://localhost:8080/cakes", HttpMethod.GET,
-				stringEntity, new ParameterizedTypeReference<CollectionModel<Cake>>() {
+				STRING_ENTITY, new ParameterizedTypeReference<CollectionModel<Cake>>() {
 				});
 		restTemplateOrderVerifier.verify(cakeServiceRestTemplate).exchange("http://localhost:8080/cakes", HttpMethod.POST,
-				chocolateCakeEntity, Cake.class);
+				CHOCOLATE_CAKE_ENTITY, Cake.class);
 		restTemplateOrderVerifier.verify(cakeServiceRestTemplate).exchange("http://localhost:8080/cakes", HttpMethod.GET,
-				stringEntity, new ParameterizedTypeReference<CollectionModel<Cake>>() {
+				STRING_ENTITY, new ParameterizedTypeReference<CollectionModel<Cake>>() {
 				});
 
 	}
@@ -144,29 +121,29 @@ public class CakeServiceTest {
 	@Test
 	public void testSaveSameCakeTwice() throws JsonProcessingException {
 
-		when(cakeServiceRestTemplate.exchange("http://localhost:8080/cakes", HttpMethod.POST, reesDonutEntity,
-				Cake.class)).thenReturn(saveCakeResponse).thenThrow(duplicateCakeException);
+		when(cakeServiceRestTemplate.exchange("http://localhost:8080/cakes", HttpMethod.POST, REESES_DONUT_ENTITY,
+				Cake.class)).thenReturn(SAVE_CAKE_RESPONSE).thenThrow(DUPLICATE_CAKE_EXCEPTION);
 
-		when(cakeServiceRestTemplate.exchange("http://localhost:8080/cakes", HttpMethod.GET, stringEntity,
+		when(cakeServiceRestTemplate.exchange("http://localhost:8080/cakes", HttpMethod.GET, STRING_ENTITY,
 				new ParameterizedTypeReference<CollectionModel<Cake>>() {
-				})).thenReturn(saveCakeGetCakesResponse).thenReturn(saveCakeGetCakesResponse);
+				})).thenReturn(SAVE_CAKE_GET_CAKES_RESPONSE).thenReturn(SAVE_CAKE_GET_CAKES_RESPONSE);
 
-		CakeServiceModel saveCakeModel = cakeService.saveCake(reesesDonut);
-		assertThat(saveCakeModel.getCakes()).isEqualTo(saveCakeList);
+		CakeServiceModel saveCakeModel = cakeService.saveCake(REESES_DONUT);
+		assertThat(saveCakeModel.getCakes()).isEqualTo(SAVE_CAKE_LIST);
 		assertThat(saveCakeModel.getCakeServiceError()).isNull();
-		saveCakeModel = cakeService.saveCake(reesesDonut);
-		assertThat(saveCakeModel.getCakes()).isEqualTo(saveCakeList);
-		assertThat(saveCakeModel.getCakeServiceError()).isEqualTo(duplicateTitleCakeServiceError);
+		saveCakeModel = cakeService.saveCake(REESES_DONUT);
+		assertThat(saveCakeModel.getCakes()).isEqualTo(SAVE_CAKE_LIST);
+		assertThat(saveCakeModel.getCakeServiceError()).isEqualTo(DUPLICATE_TITLE_CAKE_SERVICE_ERROR);
 
 		restTemplateOrderVerifier.verify(cakeServiceRestTemplate).exchange("http://localhost:8080/cakes", HttpMethod.POST,
-				reesDonutEntity, Cake.class);
+				REESES_DONUT_ENTITY, Cake.class);
 		restTemplateOrderVerifier.verify(cakeServiceRestTemplate).exchange("http://localhost:8080/cakes", HttpMethod.GET,
-				stringEntity, new ParameterizedTypeReference<CollectionModel<Cake>>() {
+				STRING_ENTITY, new ParameterizedTypeReference<CollectionModel<Cake>>() {
 				});
 		restTemplateOrderVerifier.verify(cakeServiceRestTemplate).exchange("http://localhost:8080/cakes", HttpMethod.POST,
-				reesDonutEntity, Cake.class);
+				REESES_DONUT_ENTITY, Cake.class);
 		restTemplateOrderVerifier.verify(cakeServiceRestTemplate).exchange("http://localhost:8080/cakes", HttpMethod.GET,
-				stringEntity, new ParameterizedTypeReference<CollectionModel<Cake>>() {
+				STRING_ENTITY, new ParameterizedTypeReference<CollectionModel<Cake>>() {
 				});
 
 	}
@@ -174,16 +151,16 @@ public class CakeServiceTest {
 	@Test
 	public void testUnparseableExceptionFromGetCakes() {
 
-		when(cakeServiceRestTemplate.exchange("http://localhost:8080/cakes", HttpMethod.GET, stringEntity,
+		when(cakeServiceRestTemplate.exchange("http://localhost:8080/cakes", HttpMethod.GET, STRING_ENTITY,
 				new ParameterizedTypeReference<CollectionModel<Cake>>() {
-				})).thenThrow(unparseableGetCakesException);
+				})).thenThrow(UNPARSEABLE_GET_CAKES_EXCEPTION);
 
 		CakeServiceModel getCakesModel = cakeService.getCakes();
 		assertThat(getCakesModel.getCakes()).isEmpty();
-		assertThat(getCakesModel.getCakeServiceError()).isEqualTo(unparseableGetCakesExceptionError);
+		assertThat(getCakesModel.getCakeServiceError()).isEqualTo(UNPARSEABLE_GET_CAKES_ERROR);
 
 		restTemplateOrderVerifier.verify(cakeServiceRestTemplate).exchange("http://localhost:8080/cakes", HttpMethod.GET,
-				stringEntity, new ParameterizedTypeReference<CollectionModel<Cake>>() {
+				STRING_ENTITY, new ParameterizedTypeReference<CollectionModel<Cake>>() {
 				});
 
 	}
@@ -191,21 +168,21 @@ public class CakeServiceTest {
 	@Test
 	public void testUnparseableExceptionFromSaveCake() {
 
-		when(cakeServiceRestTemplate.exchange("http://localhost:8080/cakes", HttpMethod.POST, reesDonutEntity,
-				Cake.class)).thenThrow(unparseableSaveCakeException);
+		when(cakeServiceRestTemplate.exchange("http://localhost:8080/cakes", HttpMethod.POST, REESES_DONUT_ENTITY,
+				Cake.class)).thenThrow(UNPARSEABLE_SAVE_CAKE_EXCEPTION);
 
-		when(cakeServiceRestTemplate.exchange("http://localhost:8080/cakes", HttpMethod.GET, stringEntity,
+		when(cakeServiceRestTemplate.exchange("http://localhost:8080/cakes", HttpMethod.GET, STRING_ENTITY,
 				new ParameterizedTypeReference<CollectionModel<Cake>>() {
-				})).thenReturn(getCakesResponse);
+				})).thenReturn(GET_CAKES_RESPONSE);
 
-		CakeServiceModel getCakesModel = cakeService.saveCake(reesesDonut);
-		assertThat(getCakesModel.getCakes()).isEqualTo(getCakesList);
-		assertThat(getCakesModel.getCakeServiceError()).isEqualTo(unparseableSaveCakeExceptionError);
+		CakeServiceModel getCakesModel = cakeService.saveCake(REESES_DONUT);
+		assertThat(getCakesModel.getCakes()).isEqualTo(GET_CAKES_LIST);
+		assertThat(getCakesModel.getCakeServiceError()).isEqualTo(UNPARSEABLE_SAVE_CAKE_ERROR);
 
 		restTemplateOrderVerifier.verify(cakeServiceRestTemplate).exchange("http://localhost:8080/cakes", HttpMethod.POST,
-				reesDonutEntity, Cake.class);
+				REESES_DONUT_ENTITY, Cake.class);
 		restTemplateOrderVerifier.verify(cakeServiceRestTemplate).exchange("http://localhost:8080/cakes", HttpMethod.GET,
-				stringEntity, new ParameterizedTypeReference<CollectionModel<Cake>>() {
+				STRING_ENTITY, new ParameterizedTypeReference<CollectionModel<Cake>>() {
 				});
 
 	}
@@ -213,21 +190,21 @@ public class CakeServiceTest {
 	@Test
 	public void testUnparseableExceptionsFromSaveCakeThenGetCakes() {
 
-		when(cakeServiceRestTemplate.exchange("http://localhost:8080/cakes", HttpMethod.POST, reesDonutEntity,
-				Cake.class)).thenThrow(unparseableSaveCakeException);
+		when(cakeServiceRestTemplate.exchange("http://localhost:8080/cakes", HttpMethod.POST, REESES_DONUT_ENTITY,
+				Cake.class)).thenThrow(UNPARSEABLE_SAVE_CAKE_EXCEPTION);
 
-		when(cakeServiceRestTemplate.exchange("http://localhost:8080/cakes", HttpMethod.GET, stringEntity,
+		when(cakeServiceRestTemplate.exchange("http://localhost:8080/cakes", HttpMethod.GET, STRING_ENTITY,
 				new ParameterizedTypeReference<CollectionModel<Cake>>() {
-				})).thenThrow(unparseableGetCakesException);
+				})).thenThrow(UNPARSEABLE_GET_CAKES_EXCEPTION);
 
-		CakeServiceModel getCakesModel = cakeService.saveCake(reesesDonut);
+		CakeServiceModel getCakesModel = cakeService.saveCake(REESES_DONUT);
 		assertThat(getCakesModel.getCakes()).isEmpty();
-		assertThat(getCakesModel.getCakeServiceError()).isEqualTo(unparseableGetCakesExceptionError);
+		assertThat(getCakesModel.getCakeServiceError()).isEqualTo(UNPARSEABLE_GET_CAKES_ERROR);
 
 		restTemplateOrderVerifier.verify(cakeServiceRestTemplate).exchange("http://localhost:8080/cakes", HttpMethod.POST,
-				reesDonutEntity, Cake.class);
+				REESES_DONUT_ENTITY, Cake.class);
 		restTemplateOrderVerifier.verify(cakeServiceRestTemplate).exchange("http://localhost:8080/cakes", HttpMethod.GET,
-				stringEntity, new ParameterizedTypeReference<CollectionModel<Cake>>() {
+				STRING_ENTITY, new ParameterizedTypeReference<CollectionModel<Cake>>() {
 				});
 
 	}
