@@ -53,12 +53,15 @@ public class Cake {
 		if (this == obj) {
 			return true;
 		}
-		if (!(obj instanceof Cake)) {
+		if (obj == null) {
+			return false;
+		}
+		if (getClass() != obj.getClass()) {
 			return false;
 		}
 		Cake other = (Cake) obj;
-		return Objects.equals(description, other.description) && Objects.equals(image, other.image)
-				&& Objects.equals(title, other.title);
+		return Objects.equals(title, other.title) && Objects.equals(description, other.description)
+				&& Objects.equals(image, other.image);
 	}
 	
 }
