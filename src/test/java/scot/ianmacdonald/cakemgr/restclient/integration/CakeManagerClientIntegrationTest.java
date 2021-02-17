@@ -47,7 +47,7 @@ public class CakeManagerClientIntegrationTest implements CakeManagerClientTestUt
 	private MockMvc mockMvc;
 	
 	@TestConfiguration
-	static class CakeServiceTestContextConfiguration {
+	static class CakeManagerClientIntegrationTestConfig {
 
 		@Bean
 		public CakeService cakeService() {

@@ -26,7 +26,7 @@ import scot.ianmacdonald.cakemgr.restclient.util.CakeManagerClientTestUtils;
 public class CakeServiceTest implements CakeManagerClientTestUtils {
 
 	@TestConfiguration
-	static class CakeServiceTestContextConfiguration {
+	static class CakeServiceTestConfig {
 
 		@Bean
 		public CakeService cakeService() {
