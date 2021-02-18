@@ -6,6 +6,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.List;
 
 import org.springframework.hateoas.CollectionModel;
 import org.springframework.hateoas.MediaTypes;
@@ -25,15 +26,16 @@ public interface CakeManagerClientTestUtils {
 
 	// public static final test data
 
+	String CAKE_MANAGER_WS_URL = "http://localhost:8081/cakes";
 	Cake BANOFFEE_PIE = new Cake("Banoffee Pie", "Is it banana or toffee?  Who cares? Its deelishuss!",
 			"http://www.banoffepiepics.com");
 	Cake LEMON_CHEESECAKE = new Cake("Lemon Cheesecake", "Lemony creamy cheesey goodness",
 			"http://www.lemoncheesecake.org");
 	Cake REESES_DONUT = new Cake("Reeses Donut", "Peanut butter chocolate heaven", "http://www.reesesdonut.scot");
 	Cake CHOCOLATE_CAKE = new Cake("Chocolate Cake", "Delish chok let loveliness", "http://www.chokletcake.org");
-	ArrayList<Cake> GET_CAKES_LIST = new ArrayList<>(Arrays.asList(BANOFFEE_PIE, LEMON_CHEESECAKE));
-	ArrayList<Cake> SAVE_CAKE_LIST = new ArrayList<>(Arrays.asList(BANOFFEE_PIE, LEMON_CHEESECAKE, REESES_DONUT));
-	ArrayList<Cake> SAVE_CAKE_TWICE_LIST = new ArrayList<>(
+	List<Cake> GET_CAKES_LIST = new ArrayList<>(Arrays.asList(BANOFFEE_PIE, LEMON_CHEESECAKE));
+	List<Cake> SAVE_CAKE_LIST = new ArrayList<>(Arrays.asList(BANOFFEE_PIE, LEMON_CHEESECAKE, REESES_DONUT));
+	List<Cake> SAVE_CAKE_TWICE_LIST = new ArrayList<>(
 			Arrays.asList(BANOFFEE_PIE, LEMON_CHEESECAKE, REESES_DONUT, CHOCOLATE_CAKE));
 	CollectionModel<Cake> GET_CAKES_COLLECTION_MODEL = CollectionModel.of(GET_CAKES_LIST);
 	CollectionModel<Cake> SAVE_CAKE_COLLECTION_MODEL = CollectionModel.of(SAVE_CAKE_LIST);

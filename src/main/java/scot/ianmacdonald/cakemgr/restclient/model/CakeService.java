@@ -24,6 +24,8 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 @Service
 public class CakeService {
 	
+	private static final String CAKE_MANAGER_WS_URL = "http://localhost:8081/cakes";
+
 	private static ObjectMapper objectMapper = new ObjectMapper();
 	
 	@Autowired
@@ -44,7 +46,7 @@ public class CakeService {
 		CakeServiceError cakeServiceError = null;
 
 		try {
-			cakeServiceRestTemplate.exchange("http://localhost:8080/cakes", HttpMethod.POST, entity, Cake.class);
+			cakeServiceRestTemplate.exchange(CAKE_MANAGER_WS_URL, HttpMethod.POST, entity, Cake.class);
 		} catch (HttpClientErrorException ex) {
 			String jsonErrorBody = ex.getResponseBodyAsString();
 			try {
@@ -70,7 +72,7 @@ public class CakeService {
 
 		try {
 			cakeResponse = cakeServiceRestTemplate.exchange(
-					"http://localhost:8080/cakes", HttpMethod.GET, entity,
+					CAKE_MANAGER_WS_URL, HttpMethod.GET, entity,
 					new ParameterizedTypeReference<CollectionModel<Cake>>() {
 					});
 		} catch (HttpClientErrorException ex) {
