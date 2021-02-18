@@ -23,10 +23,8 @@ import org.junit.jupiter.api.Test;
 import org.mockito.InOrder;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
-import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
-import org.springframework.boot.test.context.TestConfiguration;
+import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.context.annotation.Bean;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.hateoas.CollectionModel;
 import org.springframework.http.HttpMethod;
@@ -36,24 +34,14 @@ import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.web.client.RestTemplate;
 
 import scot.ianmacdonald.cakemgr.restclient.model.Cake;
-import scot.ianmacdonald.cakemgr.restclient.model.CakeService;
 import scot.ianmacdonald.cakemgr.restclient.util.CakeManagerClientTestUtils;
 
-@WebMvcTest
+@SpringBootTest
 @AutoConfigureMockMvc(addFilters = false)
 public class CakeManagerClientIntegrationTest implements CakeManagerClientTestUtils {
 
 	@Autowired
 	private MockMvc mockMvc;
-	
-	@TestConfiguration
-	static class CakeManagerClientIntegrationTestConfig {
-
-		@Bean
-		public CakeService cakeService() {
-			return new CakeService();
-		}
-	}
 
 	@MockBean
 	private RestTemplate cakeServiceRestTemplate;

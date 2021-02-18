@@ -53,7 +53,7 @@ public interface CakeManagerClientTestUtils {
 	HttpEntity<Cake> REESES_DONUT_ENTITY = new HttpEntity<Cake>(REESES_DONUT, HTTP_HEADERS);
 	HttpEntity<Cake> CHOCOLATE_CAKE_ENTITY = new HttpEntity<Cake>(CHOCOLATE_CAKE, HTTP_HEADERS);
 	String DUPLICATE_CAKE_ERROR_MESSAGE = "It is forbidden to create a Cake with a duplicate title";
-	String DUPLICATE_CAKE_ERROR_TRACE = "could not execute statement; SQL [n/a]; constraint [\"PUBLIC.UK_O5VGXH55G2VXMKU8W39A88WH0_INDEX_1 ON PUBLIC.CAKE(TITLE) VALUES 11\"; SQL statement: insert into cake (description, image, title, id) values (?, ?, ?, ?) [23505-200]]; nested exception is org.hibernate.exception.ConstraintViolationException: could not execute statement";
+	String DUPLICATE_CAKE_ERROR_TRACE = "could not execute statement; SQL [n/a]; constraint [\"PUBLIC.UK_O5VGXH55G2VXMKU8W39A88WH0_INDEX_1 ON PUBLIC.CAKE(TITLE) VALUES 6\"; SQL statement: insert into cake (description, image, title, id) values (?, ?, ?, ?) [23505-200]]; nested exception is org.hibernate.exception.ConstraintViolationException: could not execute statement";
 	CakeServiceError DUPLICATE_TITLE_CAKE_SERVICE_ERROR = new CakeServiceError(HttpStatus.FORBIDDEN,
 			DUPLICATE_CAKE_ERROR_MESSAGE, new Throwable(DUPLICATE_CAKE_ERROR_TRACE));
 	byte[] EXCEPTION_RESPONSE_BODY = getByteArrayForCakeError(DUPLICATE_TITLE_CAKE_SERVICE_ERROR);

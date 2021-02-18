@@ -1,14 +1,14 @@
 <!DOCTYPE HTML>
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
-<title>Getting Started: Serving Web Content</title>
+<title>Cake Manager: View and Create Cakes</title>
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
 </head>
 <body>
 
 	<h2>List of Cakes that are Stored in the Database:</h2>
 
-	<table style="width: 60%">
+	<table id="cakeTable" style="width: 60%">
 		<tr>
 			<th align="left">Title</th>
 			<th align="left">Description</th>
@@ -24,7 +24,7 @@
 
 	<h2>Add a Cake to the Database:</h2>
 
-	<form th:action="@{/cakes}" th:object="${cakeForm}" method="post">
+	<form name="cakeForm" th:action="@{/cakes}" th:object="${cakeForm}" method="post">
 		<table style="width: 35%">
 			<tr>
 				<td align="right">Title:</td>
@@ -51,7 +51,7 @@
 	<div th:if="${cakeServiceError != null}">
 		<h2>An Error Was Encountered with the Cake Service:</h2>
 
-		<table style="width: 60%">
+		<table id="errorTable" style="width: 60%">
 			<tr>
 				<td width="15%" align="left">HTTP Status:</td>
 				<td th:text="${cakeServiceError.status}">No HTTP status is
@@ -73,7 +73,7 @@
 	</div>
 
 	<br>
-	<form th:action="@{/logout}" method="post">
+	<form id="logoutForm" th:action="@{/logout}" method="post">
 		<input type="submit" value="Logout" />
 	</form>
 
