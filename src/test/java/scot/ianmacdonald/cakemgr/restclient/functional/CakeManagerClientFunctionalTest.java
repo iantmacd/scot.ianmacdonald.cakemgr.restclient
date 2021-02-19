@@ -40,23 +40,29 @@ class CakeManagerClientFunctionalTest {
 
 	private static final String CAKE_WEBAPP_BASE_URL = "http://localhost:8080";
 
-	private static Cake tableHeaders = new Cake("Title", "Description", "Image");
 	private static Cake lemonCheeseCake = new Cake("Lemon cheesecake", "A cheesecake made of lemon",
 			"https://s3-eu-west-1.amazonaws.com/s3.mediafileserver.co.uk/carnation/WebFiles/RecipeImages/lemoncheesecake_lg.jpg");
+
 	private static Cake victoriaSponge = new Cake("victoria sponge", "sponge with jam",
 			"http://www.bbcgoodfood.com/sites/bbcgoodfood.com/files/recipe_images/recipe-image-legacy-id--1001468_10.jpg");
+
 	private static Cake carrotCake = new Cake("Carrot cake", "Bugs bunnys favourite",
 			"http://www.villageinn.com/i/pies/profile/carrotcake_main1.jpg");
+
 	private static Cake bananaCake = new Cake("Banana cake", "Donkey kongs favourite",
 			"http://ukcdn.ar-cdn.com/recipes/xlarge/ff22df7f-dbcd-4a09-81f7-9c1d8395d936.jpg");
+
 	private static Cake birthdayCake = new Cake("Birthday cake", "a yearly treat",
 			"http://cornandco.com/wp-content/uploads/2014/05/birthday-cake-popcorn.jpg");
+
 	private static Cake reesesDonut = new Cake("Reeses Donut", "Chocolate peanut butter goodness",
 			"https://www.gannett-cdn.com/presto/2019/08/06/USAT/951746ac-9fcc-4a45-a439-300b72421984-Krispy_Kreme_Reeses_Lovers_Original_Filled_Doughnuts_Key_Visual_2.jpg");
+
 	private static List<Cake> defaultCakeList = new ArrayList<>(
-			Arrays.asList(tableHeaders, lemonCheeseCake, victoriaSponge, carrotCake, bananaCake, birthdayCake));
-	private static List<Cake> addedCakeList = new ArrayList<>(Arrays.asList(tableHeaders, lemonCheeseCake,
-			victoriaSponge, carrotCake, bananaCake, birthdayCake, reesesDonut));
+			Arrays.asList(lemonCheeseCake, victoriaSponge, carrotCake, bananaCake, birthdayCake));
+
+	private static List<Cake> addedCakeList = new ArrayList<>(
+			Arrays.asList(lemonCheeseCake, victoriaSponge, carrotCake, bananaCake, birthdayCake, reesesDonut));
 
 	private WebClient webClient;
 
@@ -171,15 +177,17 @@ class CakeManagerClientFunctionalTest {
 		int count = 0;
 		for (final HtmlTableRow row : cakeTable.getRows()) {
 
-			assertEquals(cakeList.get(count).getTitle(), row.getCell(0).asText());
-			assertEquals(cakeList.get(count).getDescription(), row.getCell(1).asText());
 			if (count == 0) {
-				assertEquals(cakeList.get(count).getImage(), row.getCell(2).asText());
+				assertEquals("Title", row.getCell(0).asText());
+				assertEquals("Description", row.getCell(1).asText());
+				assertEquals("Image", row.getCell(2).asText());
 			} else {
+				assertEquals(cakeList.get(count - 1).getTitle(), row.getCell(0).asText());
+				assertEquals(cakeList.get(count - 1).getDescription(), row.getCell(1).asText());
 				HtmlTableCell linkCell = row.getCell(2);
-				assertEquals(cakeList.get(count).getTitle(), linkCell.asText());
+				assertEquals(cakeList.get(count - 1).getTitle(), linkCell.asText());
 				HtmlAnchor anchor = (HtmlAnchor) linkCell.getFirstElementChild();
-				assertEquals(cakeList.get(count).getImage(), anchor.getHrefAttribute());
+				assertEquals(cakeList.get(count - 1).getImage(), anchor.getHrefAttribute());
 			}
 			count++;
 		}
