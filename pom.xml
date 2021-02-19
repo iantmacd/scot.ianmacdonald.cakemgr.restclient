@@ -101,7 +101,7 @@
 				<configuration>
 					<images>
 						<image>
-							<name>docker.io/scot.ianmacdonald.cakemgr.rest</name>
+							<name>docker.pkg.github.com/iantmacd/scot.ianmacdonald.cakemgr.rest/cake-manager-ws:latest</name>
 							<run>
 								<ports>
 									<port>8081:8081</port>
