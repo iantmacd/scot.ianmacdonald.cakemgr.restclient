@@ -2,10 +2,21 @@ package scot.ianmacdonald.cakemgr.restclient.model;
 
 import java.util.Objects;
 
+import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Size;
+
 public class Cake {
 	
+	@NotNull
+	@Size(min=2, max=50)
 	private String title;
+	
+	@NotNull
+	@Size(min=5, max=100)
 	private String description;
+	
+	@NotNull
+	@Size(min=10, max=300)
 	private String image;
 	
 	public Cake() {

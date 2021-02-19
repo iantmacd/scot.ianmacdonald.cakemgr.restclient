@@ -24,20 +24,26 @@
 
 	<h2>Add a Cake to the Database:</h2>
 
-	<form name="cakeForm" th:action="@{/cakes}" th:object="${cakeForm}" method="post">
+	<form name="cakeForm" th:action="@{/cakes}" th:object="${cakeForm}"
+		method="post">
 		<table style="width: 35%">
 			<tr>
 				<td align="right">Title:</td>
-				<td><input type="text" th:field="*{title}" maxlength="100" /></td>
+				<td><input type="text" th:field="*{title}" maxlength="50" /></td>
+				<td th:if="${#fields.hasErrors('title')}" th:errors="*{title}">Title
+					Error</td>
 			</tr>
 			<tr>
 				<td align="right">Description:</td>
 				<td><input type="text" th:field="*{description}"
 					maxlength="100" /></td>
+				<td th:if="${#fields.hasErrors('description')}" th:errors="*{description}">Description
+					Error</td>
 			</tr>
 			<tr>
 				<td align="right">Image:</td>
 				<td><input type="text" th:field="*{image}" maxlength="300" /></td>
+				<td th:if="${#fields.hasErrors('image')}" th:errors="*{image}">Title Error</td>
 			</tr>
 			<tr>
 				<td></td>
