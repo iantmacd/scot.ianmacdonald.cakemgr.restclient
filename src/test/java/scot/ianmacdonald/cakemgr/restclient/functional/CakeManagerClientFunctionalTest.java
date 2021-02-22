@@ -76,6 +76,7 @@ class CakeManagerClientFunctionalTest {
 	public void testBaseUrlDirectsToCakesContext() throws Exception {
 
 		final HtmlPage page = webClient.getPage(CAKE_WEBAPP_BASE_URL);
+
 		testIsDefaultContextPage(page);
 
 	}
@@ -112,36 +113,96 @@ class CakeManagerClientFunctionalTest {
 		testIsDefaultContextPage(page);
 
 	}
-
+	
 	@Test
 	@Order(5)
-	public void testPostCakeForm() throws Exception {
+	public void testPostCakeFormTitleInvalid() throws Exception {
 
-		HtmlPage addedCakePage = addCake();
+		HtmlPage page = submitCakeForm("", reesesDonut.getDescription(), reesesDonut.getImage());
 
-		testIsAddedCakePage(addedCakePage);
+		testCakeTableContent(page, defaultCakeList);
+
+		testCakeFormTableContent(page, "", true, reesesDonut.getDescription(), false, reesesDonut.getImage(), false);
+
+		testServerErrorTableContent(page, false);
+	}
+	
+	@Test
+	@Order(6)
+	public void testPostCakeFormDescriptionInvalid() throws Exception {
+
+		HtmlPage page = submitCakeForm(reesesDonut.getTitle(), "", reesesDonut.getImage());
+
+		testCakeTableContent(page, defaultCakeList);
+
+		testCakeFormTableContent(page, reesesDonut.getTitle(), false, "", true, reesesDonut.getImage(), false);
+
+		testServerErrorTableContent(page, false);
+	}
+	
+	@Test
+	@Order(7)
+	public void testPostCakeFormImageInvalid() throws Exception {
+
+		HtmlPage page = submitCakeForm(reesesDonut.getTitle(), reesesDonut.getDescription(), "");
+
+		testCakeTableContent(page, defaultCakeList);
+
+		testCakeFormTableContent(page, reesesDonut.getTitle(), false, reesesDonut.getDescription(), false, "", true);
+
+		testServerErrorTableContent(page, false);
+	}
+	
+	@Test
+	@Order(8)
+	public void testPostCakeFormAllFieldsInvalid() throws Exception {
+
+		HtmlPage page = submitCakeForm("", "", "");
+
+		testCakeTableContent(page, defaultCakeList);
+
+		testCakeFormTableContent(page, "", true, "", true, "", true);
+
+		testServerErrorTableContent(page, false);
 	}
 
 	@Test
-	@Order(6)
+	@Order(9)
+	public void testPostCakeForm() throws Exception {
+
+		HtmlPage page = submitCakeForm(reesesDonut.getTitle(), reesesDonut.getDescription(), reesesDonut.getImage());
+
+		testCakeTableContent(page, addedCakeList);
+
+		testCakeFormTableContent(page, "", false, "", false, "", false);
+
+		testServerErrorTableContent(page, false);
+	}
+
+	@Test
+	@Order(10)
 	public void testPostCakeFormAgain() throws Exception {
 
-		HtmlPage addedCakePage = addCake();
+		HtmlPage page = submitCakeForm(reesesDonut.getTitle(), reesesDonut.getDescription(), reesesDonut.getImage());
 
-		testIsAddedCakeErrorPage(addedCakePage);
+		testCakeTableContent(page, addedCakeList);
+
+		testCakeFormTableContent(page, "", false, "", false, "", false);
+
+		testServerErrorTableContent(page, true);
 
 	}
 
-	private HtmlPage addCake() throws IOException, MalformedURLException {
+	private HtmlPage submitCakeForm(String title, String description, String image) throws IOException, MalformedURLException {
 
 		final HtmlPage page = webClient.getPage(CAKE_WEBAPP_BASE_URL + "/cakes");
 		final HtmlForm form = page.getFormByName("cakeForm");
 		HtmlTextInput titleInput = form.getInputByName("title");
-		titleInput.setValueAttribute(reesesDonut.getTitle());
+		titleInput.setValueAttribute(title);
 		HtmlTextInput descriptionInput = form.getInputByName("description");
-		descriptionInput.setValueAttribute(reesesDonut.getDescription());
+		descriptionInput.setValueAttribute(description);
 		HtmlTextInput imageInput = form.getInputByName("image");
-		imageInput.setValueAttribute(reesesDonut.getImage());
+		imageInput.setValueAttribute(image);
 		HtmlSubmitInput submit = form.getOneHtmlElementByAttribute("input", "type", "submit");
 		HtmlPage addedCakePage = submit.click();
 		return addedCakePage;
@@ -150,23 +211,15 @@ class CakeManagerClientFunctionalTest {
 
 	private void testIsDefaultContextPage(HtmlPage page) {
 
-		testCakeTableContent(page, defaultCakeList, false);
+		testCakeTableContent(page, defaultCakeList);
+
+		testCakeFormTableContent(page, "", false, "", false, "", false);
+
+		testServerErrorTableContent(page, false);
 
 	}
 
-	private void testIsAddedCakePage(HtmlPage page) {
-
-		testCakeTableContent(page, addedCakeList, false);
-
-	}
-
-	private void testIsAddedCakeErrorPage(HtmlPage page) {
-
-		testCakeTableContent(page, addedCakeList, true);
-
-	}
-
-	private void testCakeTableContent(HtmlPage page, List<Cake> cakeList, boolean isError) {
+	private void testCakeTableContent(HtmlPage page, List<Cake> cakeList) {
 
 		assertEquals("Cake Manager: View and Create Cakes", page.getTitleText());
 		assertEquals("/cakes", page.getUrl().getPath());
@@ -192,8 +245,47 @@ class CakeManagerClientFunctionalTest {
 			count++;
 		}
 
+	}
+
+	private void testCakeFormTableContent(HtmlPage page, String titleValue, boolean isTitleError, String descriptionValue,
+			boolean isDescriptionError, String imageValue, boolean isImageError) {
+
 		HtmlForm cakeForm = page.getFormByName("cakeForm");
 		assertNotNull(cakeForm);
+
+		HtmlTable cakeFormTable = (HtmlTable) cakeForm.getFirstElementChild();
+
+		List<HtmlTableRow> tableRows = cakeFormTable.getRows();
+		assertEquals("Title:", tableRows.get(0).getCell(0).asText());
+		assertEquals("Description:", tableRows.get(1).getCell(0).asText());
+		assertEquals("Image:", tableRows.get(2).getCell(0).asText());
+
+		HtmlTextInput titleInput = (HtmlTextInput) tableRows.get(0).getCell(1).getFirstElementChild();
+		assertEquals("title", titleInput.getId());
+		assertEquals("title", titleInput.getNameAttribute());
+		assertEquals(titleValue, titleInput.getValueAttribute());
+		if (isTitleError) {
+			assertEquals("size must be between 2 and 50", tableRows.get(0).getCell(2).asText());
+		}
+
+		HtmlTextInput descriptionInput = (HtmlTextInput) tableRows.get(1).getCell(1).getFirstElementChild();
+		assertEquals("description", descriptionInput.getId());
+		assertEquals("description", descriptionInput.getNameAttribute());
+		assertEquals(descriptionValue, descriptionInput.getValueAttribute());
+		if (isDescriptionError) {
+			assertEquals("size must be between 5 and 100", tableRows.get(1).getCell(2).asText());
+		}
+
+		HtmlTextInput imageInput = (HtmlTextInput) tableRows.get(2).getCell(1).getFirstElementChild();
+		assertEquals("image", imageInput.getId());
+		assertEquals("image", imageInput.getNameAttribute());
+		assertEquals(imageValue, imageInput.getValueAttribute());
+		if (isImageError) {
+			assertEquals("size must be between 10 and 300", tableRows.get(2).getCell(2).asText());
+		}
+	}
+
+	private void testServerErrorTableContent(HtmlPage page, boolean isError) {
 
 		if (isError) {
 			HtmlTable errorTable = page.getHtmlElementById("errorTable");
