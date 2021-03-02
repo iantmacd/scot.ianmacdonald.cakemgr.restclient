@@ -9,16 +9,19 @@ public class CakeServiceModel {
 	private CakeServiceError cakeServiceError;
 	
 	public CakeServiceModel(List<Cake> cakeList, CakeServiceError cakeServiceError) {
+		
 		super();
 		this.cakeList = cakeList;
 		this.cakeServiceError = cakeServiceError;
 	}
 
 	public List<Cake> getCakes() {
+		
 		return cakeList;
 	}
 
 	public CakeServiceError getCakeServiceError() {
+		
 		return cakeServiceError;
 	}
 }

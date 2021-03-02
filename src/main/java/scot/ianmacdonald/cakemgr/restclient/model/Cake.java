@@ -23,6 +23,7 @@ public class Cake {
 	}
 	
 	public Cake(String title, String description, String image) {
+		
 		super();
 		this.title = title;
 		this.description = description;
@@ -30,37 +31,45 @@ public class Cake {
 	}
 
 	public String getTitle() {
+		
 		return this.title;
 	}
 
 	public String getDescription() {
+		
 		return this.description;
 	}
 
 	public String getImage() {
+		
 		return this.image;
 	}
 
 
 	public void setTitle(String title) {
+		
 		this.title = title;
 	}
 
 	public void setDescription(String description) {
+		
 		this.description = description;
 	}
 
 	public void setImage(String image) {
+		
 		this.image = image;
 	}
 
 	@Override
 	public int hashCode() {
+		
 		return Objects.hash(description, image, title);
 	}
 
 	@Override
 	public boolean equals(Object obj) {
+		
 		if (this == obj) {
 			return true;
 		}

@@ -18,6 +18,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 public class CakeManagerClientApplication {
 
 	public static void main(String[] args) {
+		
 		SpringApplication.run(CakeManagerClientApplication.class, args);
 	}
 

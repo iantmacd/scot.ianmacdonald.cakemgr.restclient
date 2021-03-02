@@ -26,7 +26,7 @@ public class CakeService {
 	
 	private static final String CAKE_MANAGER_WS_URL = "http://localhost:8081/cakes";
 
-	private static ObjectMapper objectMapper = new ObjectMapper();
+	private ObjectMapper objectMapper = new ObjectMapper();
 	
 	@Autowired
 	private RestTemplate cakeServiceRestTemplate;
