@@ -23,7 +23,8 @@ class CakeManagerClientApplicationTest {
 	private SecurityConfig securityConfig;
 
 	@Test
-	void contextLoads() {
+	void testApplicationContextLoads() {
+		
 		assertThat(cakeServiceRestTemplate).isNotNull();
 		assertThat(controller).isNotNull();
 		assertThat(securityConfig).isNotNull();

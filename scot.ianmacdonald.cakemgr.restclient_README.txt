@@ -23,7 +23,7 @@ The choice of Spring Boot as implementation platform will also facilitate delive
 Class CakeManagerClientApplication
 
 Provides the execution entry point for the application.  Makes use of the @SpringBootApplication annotation to implement autoconfiguration and component scanning, including scanning and autowiring of Spring Boot components provided as dependencies on the maven pom.xml classpath.
-Uses the @Bean notation to make a RestTemplate available to the application and configure for conversion between the HAL/JSON of the RESTful Web Service and Java objects handled by the Web Client.
+Uses the @Bean notation to make a RestTemplate available to the application and configure for conversion between the JSON/HAL of the RESTful Web Service and Java model objects handled by the Web Client.
 
 2.1.2 Java Package scot.ianmacdonald.cakemgr.restclient.controller
 
@@ -34,29 +34,30 @@ Autowires a reference to its CakeService collaborator using the @Autowired annot
 Provides a request mapping to ensure all requests are redirected to the "/cakes" endpoint.  This specifically addresses the functional requirement "By accessing the root of the server (/) it should be possible to list the cakes currently in the system. This must be presented in an acceptable format for a human to read.".
 Provides an http GET request mapping for the "/cakes" endpoint to query the CakeService and obtain a List<Cake> of available cakes in the DB.
 Provides an http POST request mapping for the "/cakes" endpoint to use the CakeService to save a new cake to the DB.
-After all requests to the CakeService, marshalls the state of the model objects for the view.  This includes the list of cakes, any server errors and resetting the state of the cakeForm object to be either empty or retaining its existing values.
+After all requests to the CakeService, marshalls the state of the model objects for the view.  This includes the list of cakes, any server error and resetting the state of the cakeForm object to be either empty or retaining its existing values (if form field validation errors have occurred).
 The @Valid annotation is used to configure form field validation on the cakeForm, resulting in errors being bound to the BindingResult argument to saveCake().
 The @ModelAttribute annotation is used to change the name of the cake form attribute from the default "cake" to "cakeForm".
+In all cases requests are forwarded to the Thymeleaf view component cakes.html for server side rendering.
 
 2.1.3 Java Package scot.ianmacdonald.cakemgr.restclient.model
 
 Class Cake
 
-A POJO class representing the state of a cake entity returned as HAL/JSON from the RESTful web service.
-Uses the javax.validation.constraints @NotNull and @Size annotations on its private fields to configure form field validation on this obect in Spring MVC.
+A POJO class representing the state of a cake entity returned as JSON/HAL from the RESTful web service.
+Uses the javax.validation.constraints @NotNull and @Size annotations on its private fields to configure form field validation on this object in Spring MVC.
 Overridden hashCode() and equals() methods are provided, which are used by the test frameworks.
 
 Class CakeService
 
 A business service interface object provided to encapsulate access to the RESTful web service via RestTemplate calls.  The @Service annotation is used to indicate this adoption of design patterns and to annotate the class as an @Component which will be scanned and autowired into the CakeManagerClientController.
 Uses the @Autowired annotation to configure access to the RestTemplate instance loaded as an @Bean by CakeManagerClientApplication.
-Marshalls the state needed to query the RestTemplate to GET or POST Cake objects to/from the RESTful web service using HAL/JSON.
-In the case of both getCakes() and saveCake() methods, handles potential error conditions including server-side errors returned from the HAL/JSON web service, and any potential errors caused by unreadable HAL/JSON responses from the web service.
+Marshalls the state needed to query the RestTemplate to GET or POST Cake objects to/from the RESTful web service using JSON/HAL.
+In the case of both getCakes() and saveCake() methods, handles potential error conditions including server-side errors returned from the JSON/HAL web service, and any potential errors caused by unreadable JSON/HAL responses from the web service.
 Marshalls all model state, including any returned Cake or CakeServiceError objects into a CakeServiceModel object for return to the CakeManagerClientController.
 
 Class CakeServiceError
 
-A POJO used to represent the state of a server-side error returned in the HAL/JSON response from the RESTful web service.
+A POJO used to represent the state of a server-side error returned in the JSON/HAL response from the RESTful web service.
 
 Class CakeServiceModel
 
@@ -67,20 +68,31 @@ A wrapper POJO used to allow a combination of a List<Cake> and/or CakeServiceErr
 Class SecurityConfig
 
 An @Configuration annotated class extending WebSecurityConfigurerAdapter to configure OAuth2 login delegation for the web client.
-The configure() method is overridden to force delegation of all http requests to an OAuth2 authentication server.
+The configure() method is overridden to force initial delegation of all http requests to an OAuth2 authentication server for acquisition of security credentials.
 The "/logout" endpoint is also enabled, with configuration which clears the web client session state on logout.
 
-2.1.5 Maven pom.xml
+2.1.5 View component src/main/resources/templates/cakes.html
 
-The inclusion of org.springframework.boot dependencies for spring-boot-starter-data-jpa and spring-boot-starter-data-rest respectively prompt Spring Boot to provide a JpaRepository implementation at runtime, and then expose it as a RESTful webservice.
-The dependency for com.h2database causes the JpaRepository to be implemented using Hibernate and an in-memory H2 DB.
-The dependency for spring-boot-starter-web causes this to be launched in a Tomcat webcontainer.
-The dependency for spring-boot-starter-actuator allows JMX actuator endpoints to be exposed by the web server to provide runtime tooling of the loaded Spring application context beans in Spring Tools Suite.
+A Thymeleaf view component used for server-side rendering of client view responses.
+The page contains four sections:
+1. An html table of the existing cakes in the system.  This uses Thymeleaf templating to render the cakeList:List<Cake> model collection returned from the RESTful web service.
+2. An html form that allows a user to POST a new cake to the system for saving using form cakeForm:Cake.  Optionally any form field validation errors are displayed next to the input fields after attempting to post invalid entries to the CakeManagerClientController.
+3. A section which conditionally displays any server-side error which is returned from the RESTful web service.  This is contained in the "cakeServiceError" model object.
+4. An html form which submits  a POST request to the "/logout" endpoint to trigger logout of the web client application from OAuth2.
 
 2.1.6 src/main/resources/application.yml
 
-A property of management.endpoints.web.exposure.include with a value of "*" exposes all actuator endpoints for use with Spring Tools Suite runtime tooling.
-A property of server.port with value 8081 is provided so that the embedded Tomcat instance is deployed on that port on localhost.
+Contains configuration to allow the OAuth2 SecurityConfig class to operate with a GitHub authentication server using clientId and clientSecret properties under spring.security.oauth2.client.registration.github.
+
+2.1. Maven pom.xml
+
+Dependency spring-boot-starter-web causes the application to be launched in a Tomcat webcontainer using Spring MVC.
+Dependency spring-boot-starter-security is used to configure OAuth2 security in SecurityConfig by extending WebSecurityConfigurerAdapter.
+Dependency spring-security-oauth2-client imports types required by spring-boot-starter-security.
+Dependency spring-boot-starter-validation imports the annotations used for form field validation.
+Dependency spring-boot-starter-hateoas imports data type and collection classes used to call the RestTemplate to access the RESTful web service and for mock testing.
+Dependency spring-boot-starter-thymeleaf is required for use of Thymeleaf server-side templating in view component cakes.html
+Dependency spring-boot-devtools is included to enable real-time reloading and debugging of webapplications in Spring Tools Suite.
 
 2.2 Testing
 -----------
@@ -89,38 +101,58 @@ The system is tested in slices with unit, integration and functional tests.  Moc
 
 2.2.1 Java Package scot.ianmacdonald.cakemgr.restclient
 
-Class CakeManagerApplicationTest
+Class CakeManagerClientApplicationTest
 
-Unit test class which uses @SpringBootTest annotation to load the full application context and test that the CakeRepository and RestTemplate are instantiated, and that CakeRepository is an instance of JpaRepository.
+Unit test class which uses @SpringBootTest and @Autowired annotations to load the full application context and test that the RestTemplate, CakeManagerClientController and SecurityConfig beans are instantiated.
 
 2.2.2 Java Package scot.ianmacdonald.cakemgr.restclient.controller
 
+Class CakeManagerClientControllerTest
+
+A unit/mock test which tests the Spring MVC configuration of the CakeManagerClientController by mocking its interaction with its collaborator CakeService.
+The @WebMvcTest(CakeManagerClientController.class) annotation is used to load the web application context specific to the CakeManagerClientController class so that the test does not cause an embedded Tomcat server to be loaded.
+The @AutoConfigureMockMvc(addFilters = false) annotation disables the OAuth2 configuration in SecurityConfig so that the test runs without the need to call out to an authentication server.
+The MockMvc instance made available by @WebMvcTest is autowired into the test.
+The @MockBean annotation is used to mock references to the collaborators CakeService and RestTemplate.  The RestTemplate is needed to complete the autowiring for CakeService at runtime.
+A static @BeforeAll method is used to create an InOrder verifier for the mocked CakeService.
+The @Test methods of the test then mock the behaviour of the mocked CakeService for specific method calls, and make mocked http requests to the MockMvc object.
+Test assertions are made about the  content of the returned html content and the InOrder object is used to verify the number and order of calls to the mock CakeService.
+
 2.2.3 Java Package scot.ianmacdonald.cakemgr.restclient.functional
 
-A full functional end-to-end test of the RESTful web service which requires a new instance of the application to have just been started on port 8081 in order to work.
-This test purposefully avoids use of the @SpringBootTest annotation, so that the test class does not run the application with its full application context loaded in an embedded Tomcat webserver.  This allows the test to remotely test whatever web service is running on localhost:8081.
-The class uses the @ExtendWith(SpringExtension.class) annotation in conjunction with @TestPropertySource("classpath:application-test.properties") and @Value("${property.name}") to load test data strings from src/test/resources/application-test.properties.  This was done mainly to declutter the test class and reduce errors caused by the need to escape plaintext characters in Java String objects.
-The test uses the @TestMethodOrder(OrderAnnotation.class) and @Order junit annotations to run the test methods in a prescibed order.  This is because when running the test remotely in a fully end-to-end fashion, it is not possible to make the test executions idempotent without repeatedly stopping and restarting Tomcat.  For example, the HATEOS-compatible JSON responses from the webservice expose Cake id values in their link fields.  These id values are autogenerated by Hibernate, so even requesting delete of all data in a tear down method via the webservice after each test would not be sufficient to make each test method fully idempotent, as the id sequence would continue to increment between tests.
-The test uses a RestTemplate to query the webservice, and the JSON responses received are compared to those from the test data suite in application-test.properties.  This allows the webservice to be end-to-end tested in black box mode accessed only via its publicly exposed JSON+HAL interface.
+Class CakeManagerClientFunctionalTest
+
+A full functional end-to-end test of the web client which requires a new instance of the RESTful web service application to have just been started on port 8081 in order to work.
+The test uses the @SpringBootTest annotation, with @AutoConfigureMockMvc(addFilters = false).  This means that the  test runs without creating an embedded Tomcat server and disables the OAuth2 configuration in SecurityConfig, but makes http calls out to the web service running on localhost:8081.
+The test uses the @TestMethodOrder(OrderAnnotation.class) and @Order junit annotations to run the test methods in a prescibed order.  This is because when running the test remotely in a fully end-to-end fashion, it is not possible to make the test executions idempotent without repeatedly stopping and restarting the RESTful web service running in Tomcat.
+An HtmlUnit WebClient is created for each @Test in an @BeforeEach method using MockMvcWebClientBuilder.  The WebClient is then used to drive the test by exercising the view component cakes.html as a user would operate the web client.
 
 2.2.4 Java Package scot.ianmacdonald.cakemgr.restclient.integration
 
-Class CakeManagerIntegrationTest
+Class CakeManagerClientIntegrationTest
 
-An integration test which uses @SpringBootTest with @AutoConfigureMockMvc to test the application context.  This configuration prevents an embedded Tomcat instance from being run.
-@SpringBootTest loads the entire application context, and @AutoConfigureMockMvc provides a MockMvc instance which is autowired into the test.  The MockMvc instance, an autowired CakeRepository and the MockMvc test framework are used to test findAll() and save() operations of the system, as well as the handling of error conditions (as configured in class CakeManagerErrorAdvice).  The MockMvc framework is used in conjunction with JSON Path matching to test that the http responses in all cases are HATEOAS-compliant JSON response bodies expressed in properly-formed HAL.
-A static @BeforeAll method is used with an @Autowired List<Cake> parameter to initialise static test data fields from the application context, so that the data tested comes from the canonical data source.
-All test methods which change the state of the H2 DB use the @DirtiesContext(methodMode = MethodMode.AFTER_METHOD) annotation.  This causes the application context to be discarded and reloaded after each such test, which results in class LoadDatabase reinitialising the default data in the H2 DB.  This results in the test methods executing idempotently.
-In this test, the H2 DB-backed CakeRepository is acting effectively as both the production DB and a test DB stub, such that the data source for the system does not require to be mocked.
+An integration/mock test which tests the Spring MVC configuration of the CakeManagerClientController and its interaction with its collaborator CakeService by mocking its collaborator RestTemplate.
+The test uses @SpringBootTest with @AutoConfigureMockMvc(addFilters = false).  This means that the  test runs without creating an embedded Tomcat server and disables the OAuth2 configuration in SecurityConfig.
+The MockMvc instance made available by @AutoConfigureMockMvc is autowired into the test.
+The @MockBean annotation is used to mock a reference to the collaborator RestTemplate.
+A static @BeforeAll method is used to create an InOrder verifier for the mocked RestTemplate.
+The @Test methods of the test then mock the behaviour of the mocked RestTemplate for specific method calls, and make mocked http requests to the MockMvc object.
+Test assertions are made about the  content of the returned content, and the InOrder object is used to verify the number and order of calls to the mock RestTemplate.
 
 2.2.5 Java Package scot.ianmacdonald.cakemgr.restclient.model
 
-Class CakeRepositoryTest
+Class CakeServiceErrorTest
 
-A unit test class which uses the Spring Boot @DataJpaTest annotation to only load the Data JPA layer of the Spring application context for detailed testing of the configuration at the pure Java level.  @DataJpaTest is used to autowire the instance of the CakeRepository for testing.
-The annotation @Transactional(propagation = Propagation.NOT_SUPPORTED) is used to execute the tests non-transactionally, so that @BeforeEach and @AfterEach junit annotations can be used to set up and tear down test data explicitly, so that test methods can run idempotently.
-The test checks the findAll() and save() operations, as well as checking that a DataIntegrityViolationException is thrown at the Java level when an attempt is made to violate the unique constraint on the title field in the DB.
-Again, the H2 DB is acting effectively as both the production DB and a test DB stub, such that the data source for the system does not require to be mocked.
+A plain junit 5 test which tests the equals() method of class CakeServiceError, including appropriate handling of null fields.
+
+Class CakeServiceTest
+
+A unit/mock test which tests the CakeService class by mocking its interaction with its collaborator RestTemplate.
+@ExtendWith(SpringExtension.class) annotation is used to autowire the test using an @TestConfiguration to provide the CakeService instance.  This avoids the  overhead of loading the whole Spring Boot application context.
+The @MockBean annotation is used to mock a reference to the collaborator RestTemplate.
+A static @BeforeAll method is used to create a Mockito InOrder verifier for the mocked RestTemplate.
+The @Test methods then specify the behaviour of the mocked RestTemplate for specific method calls, and exercise the methods on the autowired CakeService under test.
+Test assertions are made about the content of the returned CakeServiceModel objects, and the InOrder object is used to verify the number and order of calls to the mock CakeService.
 
 Class CakeTest
 
@@ -128,30 +160,29 @@ A plain junit 5 test which tests the equals() method of class Cake, including ap
 
 2.2.6 Java Package scot.ianmacdonald.cakemgr.restclient.util
 
+Interface CakeManagerClientTestUtils
+
+Static test data and utility methods which are reused by implementing classes CakeManagerClientControllerTest, CakeManagerClientIntegrationTest and CakeServiceTest.
+
 2.2.7 Maven pom.xml
 
-A dependency for org.springframework.boot spring-boot-starter-test is included to enable Spring Boot test facilities.  The junit-vintage-engine dependency is excluded to facilitate the use of JUnit 5 (Jupiter) test capabilities over Junit 4.
-The spring-boot-devtools dependency is included to enable real-time reloading and debugging of webapplications in Spring Tools Suite.
-The spring-boot-starter-actuator is included to enable the use of runtime bean inspection tools in Spring Tools Suite.
+Dependency spring-boot-starter-test is included to enable Spring Boot test facilities.  The junit-vintage-engine dependency is excluded to facilitate the use of JUnit 5 (Jupiter) test capabilities over Junit 4.
+Dependency htmlunit imports the HtmlUnit test clases including WebClient for use in CakeManagerClientFunctionalTest.
 Unit tests are launched from the build configuration using the maven-surefire-plugin, excluding all functional tests from this phase of the build.
-The build configuration uses the spring-boot-maven-plugin with the io.fabric8 docker-maven-plugin to build and start a Docker image of the application in the pre-integration-test phase and then stop it in the post-integration-test phase. In between these phases, in the integration-test phase, the maven-failsafe-plugin runs CakeManagerFunctionalTest. This is the reason that @TestMethodOrder(OrderAnnotation.class) and @Order junit annotations are used to run the tests in a prescribed order, so that they can run in a non-idempotent but predictable fashion without stopping and restarting the Docker image.
-The Docker image of the web service application is build to the local Docker repository as docker.pkg.github.com/iantmacd/scot.ianmacdonald.cakemgr.rest/cake-manager-ws:latest to facilitate its push to the GitHub Packages repository in continuous integration.
+The build configuration uses the spring-boot-maven-plugin with the io.fabric8 docker-maven-plugin to start a Docker image of the RESTful web service application in the pre-integration-test phase and then stop it in the post-integration-test phase. In between these phases, in the integration-test phase, the maven-failsafe-plugin runs CakeManagerClientFunctionalTest. This is the reason that @TestMethodOrder(OrderAnnotation.class) and @Order junit annotations are used to run the tests in a prescribed order, so that they can run in a non-idempotent but predictable fashion without stopping and restarting the Docker image.
+The Docker image of the web service application is obtained from the local Docker repository as docker.pkg.github.com/iantmacd/scot.ianmacdonald.cakemgr.rest/cake-manager-ws:latest.
 
-2.3 Containerisation with Docker
---------------------------------
-
-The file Dockerfile describes a sample Docker configuration which is read by the io.fabric8 docker-maven-plugin build goal and used to create a Docker image of the application, as already described above.
-
-2.4 Cloud Continuous Integration Using Github Actions
+2.3 Cloud Continuous Integration Using Github Actions
 -----------------------------------------------------
 
 A github action is configured on the github server in file maven.yml.
-The github action is setup to trigger build and then unit, integration and  functional test of the rest service application when commits are pushed to master.
+The github action is setup to trigger a build when commits are pushed to master.
+The build first performs a Docker pull of image docker.pkg.github.com/iantmacd/scot.ianmacdonald.cakemgr.rest/cake-manager-ws:latest from the GitHub packages repository.
+If this is successful, the build uses maven to run build and then unit, integration and functional test of the web client application.
 Functional testing includes the use of Docker containerisation for end-to-end functional testing by the maven build, as described above.
-Success of build and test of the application results in a Docker image of the web service application being pushed to the GitHub Packages repository with the name docker.pkg.github.com/iantmacd/scot.ianmacdonald.cakemgr.rest/cake-manager-ws:latest.  From there it can be accessed by the functional tests of the restclient project.
 
-3 Build, Execute and Exercise the Cake Manager RESTful Web Service
-==================================================================
+3 Build, Execute and Exercise the Cake Manager Web Client
+=========================================================
 
 3.1 Requirements
 
@@ -162,10 +193,13 @@ To run a full build with functional tests requires Docker to be installed and a 
 
 To build the application and run unit, integration and functional tests:
 1. Ensure that the Docker daemon is running.
-2. From the root directory of the project execute:
+2. Download the code for the Cake Manager RESTful Web Service from https://github.com/iantmacd/scot.ianmacdonald.cakemgr.rest
+3. Build and test the Cake Manager RESTful Web Service.  From the root directory of that project execute:
     mvn clean verify
-     
-These steps will build and test the service locally and build a Docker image to the local Docker repository as docker.pkg.github.com/iantmacd/scot.ianmacdonald.cakemgr.rest/cake-manager-ws:latest
+    N.B. This includes a build of a Docker image of the web service as docker.pkg.github.com/iantmacd/scot.ianmacdonald.cakemgr.rest/cake-manager-ws:latest to the local Docker repository.
+4. From the root directory of the Cake Manager Web Client:
+    mvn clean verify
+    N.B. This uses the locally available image of the web service and runs it at localhost:8081 for use by CakeManagerClientFunctionalTest.
 
 3.3 Execute the Application
 
@@ -177,35 +211,6 @@ To execute the Docker image, after building and testing the application as in st
     
 Both of these executions will launch the RESTful webservice application in an embedded Tomcat server and make it available at localhost:8081
 
-3.4 Exercise the RESTful Web Service
+3.4 Exercise the Web Client
 
-3.4.1 From a Browser
-
-Accessing http://localhost:8081/cakes will display the initial list of cakes loaded to the system.
-By default, Spring Boot exposes a link to the cakes endpoint and the /profile endpoint at http://localhost:8081
-The /profile/cakes endpoint linked from there exposes an ALPS (Application-Level Profile Semantics) metadata description of the service.
-The http://localhost:8081/actuator endpoint provides access to the JMX actuator services exposed by the management.endpoints.web.exposure.include="*" property as described above.
-
-3.4.2 From the Command Line
-
-The RESTful service can be exercised from the command line using curl.
-
-To see the initial list of loaded cakes rendered as JSON/HAL:
-    curl -i http://localhost:8081/cakes
-    
-To POST a new cake to the system and see its JSON/HAL representation returned:
-    curl -i -H "Content-Type:application/json" -d '{"title": "Banoffee Pie", "description": "Is it banana or toffee? I dont care... its DEEEELISHUSSSS", "image": "https://www.bakedbyanintrovert.com/wp-content/uploads/2019/02/Banoffee-Pie-Recipe-Image-735x735.jpg"}' http://localhost:8081/cakes
-
-To see the new list of loaded cakes as JSON/HAL, including the new cake:
-    curl -i http://localhost:8081/cakes
-    
-To post the same cake again and see the 403 response with an appropriate JSON error message:
-        curl -i -H "Content-Type:application/json" -d '{"title": "Banoffee Pie", "description": "Is it banana or toffee? I dont care... its DEEEELISHUSSSS", "image": "https://www.bakedbyanintrovert.com/wp-content/uploads/2019/02/Banoffee-Pie-Recipe-Image-735x735.jpg"}' http://localhost:8081/cakes
-        
-To post a malformed JSON POST request and see the 400 response with an appropriate JSON error message:
-    curl -i -H "Content-Type:application/json" -d '{"title"; "Banoffee Pie", "description": "Is it banana or toffee? I dont care... its DEEEELISHUSSSS", "image": "https://www.bakedbyanintrovert.com/wp-content/uploads/2019/02/Banoffee-Pie-Recipe-Image-735x735.jpg"}' http://localhost:8081/cakes
-    
-N.B. the first colon in the request body above is substituted with an invalid semi-colon.
-
-
-    
+3.4.1 

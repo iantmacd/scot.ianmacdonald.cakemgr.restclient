@@ -142,7 +142,6 @@ public class CakeManagerClientControllerTest implements CakeManagerClientTestUti
 
 		cakeServiceOrderVerifier.verify(mockCakeService).saveCake(REESES_DONUT);
 		cakeServiceOrderVerifier.verify(mockCakeService).saveCake(CHOCOLATE_CAKE);
-
 	}
 
 	@Test
@@ -182,7 +181,6 @@ public class CakeManagerClientControllerTest implements CakeManagerClientTestUti
 		assertDuplicateError(content);
 
 		cakeServiceOrderVerifier.verify(mockCakeService, times(2)).saveCake(REESES_DONUT);
-
 	}
 
 	@Test

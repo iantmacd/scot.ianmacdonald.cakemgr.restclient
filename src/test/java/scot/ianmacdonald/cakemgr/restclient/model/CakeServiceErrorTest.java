@@ -9,16 +9,27 @@ import org.springframework.http.HttpStatus;
 class CakeServiceErrorTest {
 	
 	private final CakeServiceError cakeServiceError_1 = new CakeServiceError(HttpStatus.NOT_FOUND, "Error message", new Throwable("Throwable message"));
+	
 	private final CakeServiceError cakeServiceError_2 = new CakeServiceError(HttpStatus.NOT_FOUND, "Error message", new Throwable("Throwable message"));
+	
 	private final CakeServiceError cakeServiceError_3 = new CakeServiceError(HttpStatus.FORBIDDEN, "Error message", new Throwable("Throwable message"));
+	
 	private final CakeServiceError cakeServiceError_4 = new CakeServiceError(HttpStatus.NOT_FOUND, "Different error message", new Throwable("Throwable message"));
+	
 	private final CakeServiceError cakeServiceError_5 = new CakeServiceError(HttpStatus.NOT_FOUND, "Error message", new Throwable("Different Throwable message"));
+	
 	private final CakeServiceError cakeServiceError_6 = new CakeServiceError(null, "Error message", new Throwable("Throwable message"));
+	
 	private final CakeServiceError cakeServiceError_7 = new CakeServiceError(null, "Error message", new Throwable("Throwable message"));
+	
 	private final CakeServiceError cakeServiceError_8 = new CakeServiceError(HttpStatus.NOT_FOUND, null, new Throwable("Throwable message"));
+	
 	private final CakeServiceError cakeServiceError_9 = new CakeServiceError(HttpStatus.NOT_FOUND, null, new Throwable("Throwable message"));
+	
 	private final String nullDebugMessage = null;
+	
 	private final CakeServiceError cakeServiceError_10 = new CakeServiceError(HttpStatus.NOT_FOUND, "Error message", new Throwable(nullDebugMessage));
+	
 	private final CakeServiceError cakeServiceError_11 = new CakeServiceError(HttpStatus.NOT_FOUND, "Error message", new Throwable(nullDebugMessage));
 
 	@Test
@@ -39,7 +50,6 @@ class CakeServiceErrorTest {
 		assertEquals(cakeServiceError_6, cakeServiceError_7);
 		assertNotEquals(cakeServiceError_6, cakeServiceError_1);
 		assertNotEquals(cakeServiceError_1, cakeServiceError_6);
-		
 	}
 	
 	@Test
@@ -48,7 +58,6 @@ class CakeServiceErrorTest {
 		assertEquals(cakeServiceError_8, cakeServiceError_9);
 		assertNotEquals(cakeServiceError_8, cakeServiceError_1);
 		assertNotEquals(cakeServiceError_1, cakeServiceError_8);
-		
 	}
 	
 	@Test
@@ -57,7 +66,6 @@ class CakeServiceErrorTest {
 		assertEquals(cakeServiceError_10, cakeServiceError_11);
 		assertNotEquals(cakeServiceError_10, cakeServiceError_1);
 		assertNotEquals(cakeServiceError_1, cakeServiceError_10);
-		
 	}
 
 }

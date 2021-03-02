@@ -84,7 +84,6 @@ public class CakeServiceTest implements CakeManagerClientTestUtils {
 		restTemplateOrderVerifier.verify(cakeServiceRestTemplate).exchange(CAKE_MANAGER_WS_URL, HttpMethod.GET,
 				STRING_ENTITY, new ParameterizedTypeReference<CollectionModel<Cake>>() {
 				});
-
 	}
 
 	@Test
@@ -115,7 +114,6 @@ public class CakeServiceTest implements CakeManagerClientTestUtils {
 		restTemplateOrderVerifier.verify(cakeServiceRestTemplate).exchange(CAKE_MANAGER_WS_URL, HttpMethod.GET,
 				STRING_ENTITY, new ParameterizedTypeReference<CollectionModel<Cake>>() {
 				});
-
 	}
 
 	@Test
@@ -145,7 +143,6 @@ public class CakeServiceTest implements CakeManagerClientTestUtils {
 		restTemplateOrderVerifier.verify(cakeServiceRestTemplate).exchange(CAKE_MANAGER_WS_URL, HttpMethod.GET,
 				STRING_ENTITY, new ParameterizedTypeReference<CollectionModel<Cake>>() {
 				});
-
 	}
 
 	@Test
@@ -162,7 +159,6 @@ public class CakeServiceTest implements CakeManagerClientTestUtils {
 		restTemplateOrderVerifier.verify(cakeServiceRestTemplate).exchange(CAKE_MANAGER_WS_URL, HttpMethod.GET,
 				STRING_ENTITY, new ParameterizedTypeReference<CollectionModel<Cake>>() {
 				});
-
 	}
 
 	@Test
@@ -184,7 +180,6 @@ public class CakeServiceTest implements CakeManagerClientTestUtils {
 		restTemplateOrderVerifier.verify(cakeServiceRestTemplate).exchange(CAKE_MANAGER_WS_URL, HttpMethod.GET,
 				STRING_ENTITY, new ParameterizedTypeReference<CollectionModel<Cake>>() {
 				});
-
 	}
 
 	@Test
@@ -206,7 +201,6 @@ public class CakeServiceTest implements CakeManagerClientTestUtils {
 		restTemplateOrderVerifier.verify(cakeServiceRestTemplate).exchange(CAKE_MANAGER_WS_URL, HttpMethod.GET,
 				STRING_ENTITY, new ParameterizedTypeReference<CollectionModel<Cake>>() {
 				});
-
 	}
 
 }

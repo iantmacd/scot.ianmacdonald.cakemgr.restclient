@@ -68,6 +68,7 @@ class CakeManagerClientFunctionalTest {
 
 	@BeforeEach
 	void setup(WebApplicationContext context) {
+		
 		webClient = MockMvcWebClientBuilder.webAppContextSetup(context).build();
 	}
 
@@ -78,7 +79,6 @@ class CakeManagerClientFunctionalTest {
 		final HtmlPage page = webClient.getPage(CAKE_WEBAPP_BASE_URL);
 
 		testIsDefaultContextPage(page);
-
 	}
 
 	@Test
@@ -87,7 +87,6 @@ class CakeManagerClientFunctionalTest {
 
 		final HtmlPage page = webClient.getPage(CAKE_WEBAPP_BASE_URL + "/");
 		testIsDefaultContextPage(page);
-
 	}
 
 	@Test
@@ -102,7 +101,6 @@ class CakeManagerClientFunctionalTest {
 
 		final HtmlPage pageThree = webClient.getPage(CAKE_WEBAPP_BASE_URL + "/the/path/less/travelled");
 		testIsDefaultContextPage(pageThree);
-
 	}
 
 	@Test
@@ -111,7 +109,6 @@ class CakeManagerClientFunctionalTest {
 
 		final HtmlPage page = webClient.getPage(CAKE_WEBAPP_BASE_URL + "/cakes");
 		testIsDefaultContextPage(page);
-
 	}
 	
 	@Test
@@ -190,7 +187,6 @@ class CakeManagerClientFunctionalTest {
 		testCakeFormTableContent(page, "", false, "", false, "", false);
 
 		testServerErrorTableContent(page, true);
-
 	}
 
 	private HtmlPage submitCakeForm(String title, String description, String image) throws IOException, MalformedURLException {
@@ -206,7 +202,6 @@ class CakeManagerClientFunctionalTest {
 		HtmlSubmitInput submit = form.getOneHtmlElementByAttribute("input", "type", "submit");
 		HtmlPage addedCakePage = submit.click();
 		return addedCakePage;
-
 	}
 
 	private void testIsDefaultContextPage(HtmlPage page) {
@@ -216,7 +211,6 @@ class CakeManagerClientFunctionalTest {
 		testCakeFormTableContent(page, "", false, "", false, "", false);
 
 		testServerErrorTableContent(page, false);
-
 	}
 
 	private void testCakeTableContent(HtmlPage page, List<Cake> cakeList) {
@@ -283,6 +277,7 @@ class CakeManagerClientFunctionalTest {
 		if (isImageError) {
 			assertEquals("size must be between 10 and 300", tableRows.get(2).getCell(2).asText());
 		}
+		
 	}
 
 	private void testServerErrorTableContent(HtmlPage page, boolean isError) {
@@ -304,6 +299,7 @@ class CakeManagerClientFunctionalTest {
 				page.getHtmlElementById("errorTable");
 			});
 		}
+		
 	}
 
 }
