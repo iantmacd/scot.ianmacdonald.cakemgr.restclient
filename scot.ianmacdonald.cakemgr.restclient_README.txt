@@ -203,14 +203,66 @@ To build the application and run unit, integration and functional tests:
 
 3.3 Execute the Application
 
-To execute using the maven spring-boot plugin, from the root directory execute:
+3.3.1 Execute the Cake Manager RESTful Web Service
+
+For the Cake Manager Web Client to execute locally, first the Cake Manager RESTful Web Service must be running on localhost port 8081.
+
+1. Download the code for the Cake Manager RESTful Web Service from https://github.com/iantmacd/scot.ianmacdonald.cakemgr.rest
+2. To execute the web service with maven, from the project root directory, execute:
+    mvn spring-boot:run
+3. Alternatively, to run the web service as a Docker image, ensure the Docker daemon is running and then from the project root directory execute:
+    mvn clean verify
+   Then run the docker image of the  web service from the local docker repository:
+    docker run -p 8081:8081 docker.pkg.github.com/iantmacd/scot.ianmacdonald.cakemgr.rest/cake-manager-ws
+
+3.3.2 Execute the Cake Manager Web Client
+
+From the Cake Manager Web Client root directory execute:
     mvn spring-boot:run
     
-To execute the Docker image, after building and testing the application as in step 3.2, with a Docker daemon running, execute:
-    docker run -p 8081:8081 docker.pkg.github.com/iantmacd/scot.ianmacdonald.cakemgr.rest/cake-manager-ws
-    
-Both of these executions will launch the RESTful webservice application in an embedded Tomcat server and make it available at localhost:8081
+The Cake Manager Web Client will now be running on localhost at port 8080.
 
-3.4 Exercise the Web Client
+3.4 Exercise the Cake Manager Web Client
 
-3.4.1 
+3.4.1 Login
+
+1. Before logging in, check the local user is signed out from the github website.
+2. Using a web browser, access http://localhost:8080/cakes.
+    N.B. Any context path at localhost:8080 other than "/logout" should redirect to "/cakes".
+3. The use will be redirected to github.com login page "Sign in to GitHub to continue to Cake Manager".
+4. Enter your github username and password and click "Sign in".
+5. You will be redirected to http://localhost:8080/cakes where you will see the page with title "Cake Manager: View and Create Cakes".
+
+3.4.2 View existing cakes - including photo links
+
+1. The first section "List of Cakes that are Stored in the Database:" shows a table of the cakes, displaying their title, description and a link to the image.
+2. Clicking on the image link navigates to the image for the cake (if the link is valid).
+
+3.4.3 Create a cake - can be viewed as before
+
+1. In the second section "Add a Cake to the Database:", input a title, description and an image link for a new cake and click "Add Cake".
+2. If form field validation is passed and the cake title is unique, the cake is added to the DB and you are returned to the view.
+3. The new cake is added to the table of cakes.
+4. You can click on the link of the cake image to navigate to the new cake's image, as before.
+
+3.4.4 Check form field validation
+
+1. In the second section "Add a Cake to the Database:", leave any field empty or enter a single character and click "Add Cake".
+2. A new cake will not be created and you will be returned to the main view.
+3. Form fields will remain populated with your entries and validation errors will be displayed next to any input fields with invalid data.
+
+3.4.5 Create a cake with duplicate title
+
+1. As above, input details for a new cake with a duplicate title to one already displayed and click "Add Cake".
+2. A new cake will not be created and you will be returned to the main view.
+3. A new section of the page "An Error Was Encountered with the Cake Service:" will be displayed.
+4. This will report detail of the server-side error giving rise to the error condition.
+
+3.4.6 Logout
+
+1. Click on the "Logout" button at the bottom of the page.
+2. You will be redirected to the "Please sign in" page which shows a link to the GitHub authentication server.
+3. If you remain signed in to github, clicking the "GitHub" link will reauthenticate the user and return you to the cake view page.
+4. If you have signed out of github, clicking the "GitHub" link will redirect you to the github.com login page "Sign in to GitHub to continue to Cake Manager".
+5. Alternatively, entering http://localhost:8080/logout in the browser (as a GET request) will redirect to the "Confirm Log Out" page.
+6. Clicking "Log Out" will then issue a POST request to http://localhost:8080/logout and forward the user to the "Please sign in" page as above.
