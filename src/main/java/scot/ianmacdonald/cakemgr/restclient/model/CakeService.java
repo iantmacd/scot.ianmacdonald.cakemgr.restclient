@@ -25,11 +25,20 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 public class CakeService {
 	
 	private static final String CAKE_MANAGER_WS_URL = "http://localhost:8081/cakes";
-
-	private ObjectMapper objectMapper = new ObjectMapper();
 	
 	@Autowired
 	private RestTemplate cakeServiceRestTemplate;
+
+	private ObjectMapper objectMapper = new ObjectMapper();
+	
+	private HttpHeaders httpHeaders = new HttpHeaders();
+	
+	{
+		httpHeaders.setContentType(MediaTypes.HAL_JSON);
+		httpHeaders.setAccept(Collections.singletonList(MediaTypes.HAL_JSON));
+	}
+	
+	private HttpEntity<String> stringEntity = new HttpEntity<String>("", httpHeaders);
 	
 	public CakeServiceModel getCakes() {
 		
@@ -38,9 +47,6 @@ public class CakeService {
 	
 	public CakeServiceModel saveCake(final Cake cake) {
 		
-		HttpHeaders httpHeaders = new HttpHeaders();
-		httpHeaders.setContentType(MediaTypes.HAL_JSON);
-		httpHeaders.setAccept(Collections.singletonList(MediaTypes.HAL_JSON));
 		HttpEntity<Cake> entity = new HttpEntity<Cake>(cake, httpHeaders);
 
 		CakeServiceError cakeServiceError = null;
@@ -63,16 +69,11 @@ public class CakeService {
 	
 	private CakeServiceModel getModelForView(CakeServiceError cakeServiceError) {
 		
-		HttpHeaders httpHeaders = new HttpHeaders();
-		httpHeaders.setContentType(MediaTypes.HAL_JSON);
-		httpHeaders.setAccept(Collections.singletonList(MediaTypes.HAL_JSON));
-		HttpEntity<String> entity = new HttpEntity<String>("", httpHeaders);
-		
 		ResponseEntity<CollectionModel<Cake>> cakeResponse = null;
 
 		try {
 			cakeResponse = cakeServiceRestTemplate.exchange(
-					CAKE_MANAGER_WS_URL, HttpMethod.GET, entity,
+					CAKE_MANAGER_WS_URL, HttpMethod.GET, stringEntity,
 					new ParameterizedTypeReference<CollectionModel<Cake>>() {
 					});
 		} catch (HttpClientErrorException ex) {

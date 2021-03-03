@@ -189,6 +189,15 @@ class CakeManagerClientFunctionalTest {
 		testServerErrorTableContent(page, true);
 	}
 
+	private void testIsDefaultContextPage(HtmlPage page) {
+
+		testCakeTableContent(page, defaultCakeList);
+
+		testCakeFormTableContent(page, "", false, "", false, "", false);
+
+		testServerErrorTableContent(page, false);
+	}
+	
 	private HtmlPage submitCakeForm(String title, String description, String image) throws IOException, MalformedURLException {
 
 		final HtmlPage page = webClient.getPage(CAKE_WEBAPP_BASE_URL + "/cakes");
@@ -202,15 +211,6 @@ class CakeManagerClientFunctionalTest {
 		HtmlSubmitInput submit = form.getOneHtmlElementByAttribute("input", "type", "submit");
 		HtmlPage addedCakePage = submit.click();
 		return addedCakePage;
-	}
-
-	private void testIsDefaultContextPage(HtmlPage page) {
-
-		testCakeTableContent(page, defaultCakeList);
-
-		testCakeFormTableContent(page, "", false, "", false, "", false);
-
-		testServerErrorTableContent(page, false);
 	}
 
 	private void testCakeTableContent(HtmlPage page, List<Cake> cakeList) {
