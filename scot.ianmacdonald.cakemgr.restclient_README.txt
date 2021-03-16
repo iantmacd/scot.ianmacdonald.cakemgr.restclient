@@ -177,7 +177,7 @@ The Docker image of the web service application is obtained from the local Docke
 -----------------------------------------------------
 
 A github action is configured on the github server in file maven.yml.
-The github action is setup to trigger a build when commits are pushed to master.
+The github action is setup to trigger a build when commits are pushed to master, or when a repository_dispatch event is detected as a result of a successful build of the RESTful webservice project.
 The build first performs a Docker pull of image docker.pkg.github.com/iantmacd/scot.ianmacdonald.cakemgr.rest/cake-manager-ws:latest from the GitHub Packages repository.
 If this is successful, the build uses maven to run build and then unit, integration and functional test of the web client application.
 Functional testing includes the use of Docker containerisation for end-to-end functional testing by the maven build, as described above.
