@@ -20,6 +20,7 @@ public class Cake {
 	private String image;
 	
 	public Cake() {
+		
 	}
 	
 	public Cake(String title, String description, String image) {

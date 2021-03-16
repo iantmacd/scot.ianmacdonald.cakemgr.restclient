@@ -1,5 +1,5 @@
 Ian MacDonald Cake Manager Web Client Phase 2 Submission
-=================================================================
+========================================================
 
 1 Requirements Analysis
 =======================
@@ -33,8 +33,8 @@ Class CakeManagerClientController
 The Spring MVC controller configuration for the Web Client application (uses the @Controller annotation to denote this).
 Autowires a reference to its CakeService collaborator using the @Autowired annotation.
 Provides a request mapping to ensure all requests are redirected to the "/cakes" endpoint.  This specifically addresses the functional requirement "By accessing the root of the server (/) it should be possible to list the cakes currently in the system. This must be presented in an acceptable format for a human to read.".
-Provides an http GET request mapping for the "/cakes" endpoint to query the CakeService and obtain a List<Cake> of available cakes in the DB.
-Provides an http POST request mapping for the "/cakes" endpoint to use the CakeService to save a new cake to the DB.
+Provides an HTTP GET request mapping for the "/cakes" endpoint to query the CakeService and obtain a List<Cake> of available cakes in the DB.
+Provides an HTTP POST request mapping for the "/cakes" endpoint to use the CakeService to save a new cake to the DB.
 After all requests to the CakeService, marshalls the state of the model objects for the view.  This includes the list of cakes, any server error and resetting the state of the cakeForm object to be either empty or retaining its existing values (if form field validation errors have occurred).
 The @Valid annotation is used to configure form field validation on the cakeForm, resulting in errors being bound to the BindingResult parameter of saveCake().
 The @ModelAttribute annotation is used to change the name of the Cake form attribute from the default "cake" to "cakeForm".
@@ -69,17 +69,17 @@ A wrapper POJO used to allow a combination of a List<Cake> and/or CakeServiceErr
 Class SecurityConfig
 
 An @Configuration annotated class extending WebSecurityConfigurerAdapter to configure OAuth2 login delegation for the web client.
-The configure() method is overridden to force initial delegation of all http requests to an OAuth2 authentication server for acquisition of security credentials.
+The configure() method is overridden to force initial delegation of all HTTP requests to an OAuth2 authentication server for acquisition of security credentials.
 The "/logout" endpoint is also enabled, with configuration which clears the web client session state on logout.
 
 2.1.5 View component src/main/resources/templates/cakes.html
 
 A Thymeleaf view component used for server-side rendering of client view responses.
 The page contains four sections:
-1. An html table of the existing cakes in the system.  This uses Thymeleaf templating to render the cakeList:List<Cake> model collection returned from the RESTful web service.
-2. An html form that allows a user to POST a new cake to the system for saving using form cakeForm:Cake.  Optionally any form field validation errors are displayed next to the input fields if attempt is made to post invalid entries to the CakeManagerClientController.
+1. An HTML table of the existing cakes in the system.  This uses Thymeleaf templating to render the cakeList:List<Cake> model collection returned from the RESTful web service.
+2. An HTML form that allows a user to POST a new cake to the system for saving using form cakeForm:Cake.  Optionally any form field validation errors are displayed next to the input fields if attempt is made to post invalid entries to the CakeManagerClientController.
 3. A section which conditionally displays any server-side error which is returned from the RESTful web service.  This is contained in the "cakeServiceError" model object.
-4. An html form which submits  a POST request to the "/logout" endpoint to trigger logout of the web client application from OAuth2.
+4. An HTML form which submits a POST request to the "/logout" endpoint to trigger logout of the web client application from OAuth2.
 
 2.1.6 src/main/resources/application.yml
 
@@ -116,16 +116,16 @@ The @AutoConfigureMockMvc(addFilters = false) annotation disables the OAuth2 con
 The MockMvc instance made available by @WebMvcTest is autowired into the test.
 The @MockBean annotation is used to mock references to the collaborators CakeService and RestTemplate.  The RestTemplate is needed to complete the autowiring for CakeService at runtime.
 A static @BeforeAll method is used to create a Mockito InOrder verifier for the mocked CakeService.
-The @Test methods of the test then specify the behaviour of the mocked CakeService for specific method calls, and make mocked http requests to the MockMvc object.
-Test assertions are made about the value of the returned html content and the InOrder object is used to verify the number and order of calls to the mock CakeService.
+The @Test methods of the test then specify the behaviour of the mocked CakeService for specific method calls, and make mocked HTTP requests to the MockMvc object.
+Test assertions are made about the value of the returned HTML content and the InOrder object is used to verify the number and order of calls to the mock CakeService.
 
 2.2.3 Java Package scot.ianmacdonald.cakemgr.restclient.functional
 
 Class CakeManagerClientFunctionalTest
 
 A full functional end-to-end test of the web client which requires a new instance of the RESTful web service application to have just been started on localhost port 8081.
-The test uses the @SpringBootTest annotation, with @AutoConfigureMockMvc(addFilters = false).  This means that the  test runs without creating an embedded Tomcat server and disables the OAuth2 configuration in SecurityConfig, but makes http calls out to the web service running on localhost:8081.
-The test uses the @TestMethodOrder(OrderAnnotation.class) and @Order junit annotations to run the test methods in a prescibed order.  This is because when running the test remotely in a fully end-to-end fashion, it is not possible to make the test executions idempotent without repeatedly stopping and restarting the RESTful web service running in Tomcat.
+The test uses the @SpringBootTest annotation, with @AutoConfigureMockMvc(addFilters = false).  This means that the test runs without creating an embedded Tomcat server and disables the OAuth2 configuration in SecurityConfig, but makes HTTP calls out to the web service running on localhost:8081.
+The test uses the @TestMethodOrder(OrderAnnotation.class) and @Order JUnit annotations to run the test methods in a prescibed order.  This is because when running the test remotely in a fully end-to-end fashion, it is not possible to make the test executions idempotent without repeatedly stopping and restarting the RESTful web service running in Tomcat.
 An HtmlUnit WebClient is created for each @Test in an @BeforeEach method using MockMvcWebClientBuilder.  The WebClient is then used to drive the test by exercising the view component cakes.html as a user would operate the web client.
 
 2.2.4 Java Package scot.ianmacdonald.cakemgr.restclient.integration
@@ -133,18 +133,18 @@ An HtmlUnit WebClient is created for each @Test in an @BeforeEach method using M
 Class CakeManagerClientIntegrationTest
 
 An integration/mock test which tests the Spring MVC configuration of the CakeManagerClientController and its interaction with its collaborator CakeService by mocking its collaborator RestTemplate.
-The test uses @SpringBootTest with @AutoConfigureMockMvc(addFilters = false).  This means that the  test runs without creating an embedded Tomcat server and disables the OAuth2 configuration in SecurityConfig.
+The test uses @SpringBootTest with @AutoConfigureMockMvc(addFilters = false).  This means that the test runs without creating an embedded Tomcat server and disables the OAuth2 configuration in SecurityConfig.
 The MockMvc instance made available by @AutoConfigureMockMvc is autowired into the test.
 The @MockBean annotation is used to mock a reference to the collaborator RestTemplate.
 A static @BeforeAll method is used to create a Mockito InOrder verifier for the mocked RestTemplate.
-The @Test methods of the test then specify the behaviour of the mocked RestTemplate for specific method calls, and make mocked http requests to the MockMvc object.
+The @Test methods of the test then specify the behaviour of the mocked RestTemplate for specific method calls, and make mocked HTTP requests to the MockMvc object.
 Test assertions are made about the value of the returned content, and the InOrder object is used to verify the number and order of calls to the mock RestTemplate.
 
 2.2.5 Java Package scot.ianmacdonald.cakemgr.restclient.model
 
 Class CakeServiceErrorTest
 
-A plain junit 5 test which tests the equals() method of class CakeServiceError, including appropriate handling of null fields.
+A plain JUnit 5 test which tests the equals() method of class CakeServiceError, including appropriate handling of null fields.
 
 Class CakeServiceTest
 
@@ -157,7 +157,7 @@ Test assertions are made about the content of the returned CakeServiceModel obje
 
 Class CakeTest
 
-A plain junit 5 test which tests the equals() method of class Cake, including appropriate handling of null fields.
+A plain JUnit 5 test which tests the equals() method of class Cake, including appropriate handling of null fields.
 
 2.2.6 Java Package scot.ianmacdonald.cakemgr.restclient.util
 
@@ -167,10 +167,10 @@ Static test data and utility methods which are reused by implementing classes Ca
 
 2.2.7 Maven pom.xml
 
-Dependency spring-boot-starter-test is included to enable Spring Boot test facilities.  The junit-vintage-engine dependency is excluded to facilitate the use of JUnit 5 (Jupiter) test capabilities over Junit 4.
-Dependency htmlunit imports the HtmlUnit test clases including WebClient for use in CakeManagerClientFunctionalTest.
+Dependency spring-boot-starter-test is included to enable Spring Boot test facilities.  The junit-vintage-engine dependency is excluded to facilitate the use of JUnit 5 (Jupiter) test capabilities over JUnit 4.
+Dependency htmlunit imports the HtmlUnit test classes including WebClient for use in CakeManagerClientFunctionalTest.
 Unit tests are launched from the build configuration using the maven-surefire-plugin, excluding all functional tests from this phase of the build.
-The build configuration uses the spring-boot-maven-plugin with the io.fabric8 docker-maven-plugin to start a Docker image of the RESTful web service application in the pre-integration-test phase and then stop it in the post-integration-test phase. In between these phases, in the integration-test phase, the maven-failsafe-plugin runs CakeManagerClientFunctionalTest. This is the reason that @TestMethodOrder(OrderAnnotation.class) and @Order junit annotations are used to run the tests in a prescribed order, so that they can run in a non-idempotent but predictable fashion without stopping and restarting the Docker image.
+The build configuration uses the spring-boot-maven-plugin with the io.fabric8 docker-maven-plugin to start a Docker image of the RESTful web service application in the pre-integration-test phase and then stop it in the post-integration-test phase. In between these phases, in the integration-test phase, the maven-failsafe-plugin runs CakeManagerClientFunctionalTest. This is the reason that @TestMethodOrder(OrderAnnotation.class) and @Order JUnit annotations are used to run the tests in a prescribed order, so that they can run in a non-idempotent but predictable fashion without stopping and restarting the Docker image.
 The Docker image of the web service application is obtained from the local Docker repository as docker.pkg.github.com/iantmacd/scot.ianmacdonald.cakemgr.rest/cake-manager-ws:latest.
 
 2.3 Cloud Continuous Integration Using Github Actions
@@ -237,11 +237,11 @@ The Cake Manager Web Client will now be running on localhost at port 8080.
 3.4.2 View existing cakes
 
 1. The first section "List of Cakes that are Stored in the Database:" shows a table of the cakes, displaying their title, description and a link to the image.
-2. Clicking on the image link navigates to the image for the cake (if the link is valid).
+2. Clicking on the image link navigates to the image for the cake (if the URL is valid).
 
 3.4.3 Create a cake
 
-1. In the second section "Add a Cake to the Database:", input a title, description and an image link for a new cake and click "Add Cake".
+1. In the second section "Add a Cake to the Database:", input a title, description and an image URL for a new cake and click "Add Cake".
 2. If form field validation is passed and the cake title is unique, the cake is added to the DB and you are returned to the view.
 3. The new cake is added to the table of cakes.
 4. You can click on the link of the cake image to navigate to the new cake's image, as before.
