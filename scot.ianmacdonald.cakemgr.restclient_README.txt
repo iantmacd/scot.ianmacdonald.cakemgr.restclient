@@ -231,7 +231,7 @@ The Cake Manager Web Client will now be running on localhost at port 8080.
 2. Using a web browser, access http://localhost:8080/cakes.
     N.B. Any context path at localhost:8080 other than "/logout" should redirect to "/cakes".
 3. The user will be redirected to github.com login page "Sign in to GitHub to continue to Cake Manager".
-4. Enter your github username and password and click "Sign in".
+4. Enter your github username and password and click "Sign in".   On first login, you will be asked to verify access of your account to the Cake Manager application.
 5. You will be redirected to http://localhost:8080/cakes where you will see the page with title "Cake Manager: View and Create Cakes".
 
 3.4.2 View existing cakes
